@@ -51,3 +51,8 @@ git push origin nguyen-quoc-dat
 
 - Không bao giờ push trực tiếp lên `main`.
 - Luôn kiểm tra và xử lý conflict trước khi merge PR.
+
+6. **Đưa code từ main vào nhánh**
+```bash
+git merge main
+```
