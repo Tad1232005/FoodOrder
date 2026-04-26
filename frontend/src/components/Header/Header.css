@@ -44,17 +44,47 @@
     background-color: #fff;
     cursor: pointer;
 }
-@media (max-width: 750px){
-     .header{
-        height: 38vw;;
-     }
-     .header-contents{
+
+@media (max-width: 1050px) {
+    .header {
+        height: 38vw;
+        ;
+    }
+
+    .header-contents {
+        max-width: 45%;
+    }
+}
+
+@media (max-width: 750px) {
+    .header {
+        border-radius: 16px;
+        ;
+    }
+
+    .header-contents {
         max-width: 65%;
-     }
-     .header-contents p{
+    }
+
+    .header-contents p {
         display: none;
-     }
-     .header-contents button{
+    }
+
+    .header-contents button {
         padding: 2vw 4vw;
-     }
+    }
+}
+
+@media (max-width: 600px) {
+    .header-contents {
+        max-width: 85%;
+    }
+
+    .header-contents p {
+        display: none;
+    }
+
+    .header-contents button {
+        padding: 2vw 3.5vw;
+    }
 }

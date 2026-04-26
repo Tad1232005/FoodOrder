@@ -24,7 +24,7 @@ app.use("/api/cart", cartRouter);
 
 
 app.get("/", (req, res) => {
-    res.send("API Đang Chạy...");
+    res.send("API Working...");
 });
 
 // listen

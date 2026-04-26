@@ -17,10 +17,10 @@ const addFood = async (req, res) => {
 
     try {
         await food.save(); // Note: Lưu món ăn vào MongoDB
-        res.json({ success: true, message: "Thêm món ăn thành công!" });
+        res.json({ success: true, message: "Food Added!" });
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Lỗi! Không thể thêm món ăn." });
+        res.json({ success: false, message: "Error. Food not added!" });
     }
 }
 // all food list
