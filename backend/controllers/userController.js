@@ -15,13 +15,13 @@ const loginUser = async (req, res) => {
         // Kiểm tra xem user có tồn tại không
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.json({ success: false, message: "Tài khoản không tồn tại!" });
+            return res.json({ success: false, message: "This account does not exist!" });
         }
 
         // So sánh mật khẩu
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.json({ success: false, message: "Mật khẩu không chính xác!" });
+            return res.json({ success: false, message: "Incorrect password!" });
         }
 
         // Cấp token nếu đúng
@@ -30,7 +30,7 @@ const loginUser = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Lỗi đăng nhập" });
+        res.json({ success: false, message: "Sign-in error" });
     }
 }
 
@@ -41,17 +41,17 @@ const registerUser = async (req, res) => {
         // Kiểm tra xem email đã được dùng chưa
         const exists = await userModel.findOne({ email });
         if (exists) {
-            return res.json({ success: false, message: "Email này đã được sử dụng!" });
+            return res.json({ success: false, message: "This email has already been used!" });
         }
 
         // Kiểm tra định dạng email
         if (!validator.isEmail(email)) {
-            return res.json({ success: false, message: "Vui lòng nhập email hợp lệ!" });
+            return res.json({ success: false, message: "Please enter a valid email!" });
         }
 
         // Kiểm tra độ dài mật khẩu
         if (password.length < 8) {
-            return res.json({ success: false, message: "Mật khẩu phải có ít nhất 8 ký tự!" });
+            return res.json({ success: false, message: "The password must be at least 8 characters long!" });
         }
 
         // Mã hóa mật khẩu
@@ -72,7 +72,7 @@ const registerUser = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Lỗi đăng ký" });
+        res.json({ success: false, message: "Sign-up error" });
     }
 }
 
