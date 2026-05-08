@@ -39,7 +39,7 @@
   margin-top: 80px;
   display: flex;
   justify-content: space-between;
-  gap: 12vw;
+  gap: max(12vw, 20px);
 }
 
 .cart-total {
@@ -55,6 +55,10 @@
   color: #555;
 }
 
+.cart-total hr {
+  margin: 10px 0px;
+}
+
 .cart-total button {
   border: none;
   color: white;
@@ -68,4 +72,22 @@
 
 .cart-total button:hover {
   background-color: #ff4733;
+}
+
+@media (max-width: 750px) {
+  .cart-items-item img {
+    border-radius: 4px;
+  }
+
+  .cart-items-item .Remove {
+    width: 80%;
+  }
+
+  .cart-bottom {
+    flex-direction: column-reverse;
+  }
+
+  .cart-promocode {
+    justify-content: start;
+  }
 }

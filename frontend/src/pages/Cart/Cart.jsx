@@ -4,69 +4,92 @@ import { StoreContext } from '../../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-  const { cartItems, food_list, removeFromCart, getTotalCartAmount } = useContext(StoreContext);
+  const { cartItems, food_list, removeFromCart, getTotalCartAmount, url } = useContext(StoreContext);
   const navigate = useNavigate();
 
-  // LỚP BẢO VỆ: Nếu dữ liệu chưa sẵn sàng, hiển thị chữ "Đang tải..." thay vì làm sập trang
+  // LỚP BẢO VỆ: Nếu dữ liệu chưa sẵn sàng, hiển thị chữ "Đang tải..."
   if (!food_list || !cartItems) {
-    return <div style={{marginTop: '100px', textAlign: 'center'}}><h2>Đang tải dữ liệu giỏ hàng...</h2></div>;
+    return <div style={{ marginTop: '100px', textAlign: 'center' }}><h2>Loading cart data...</h2></div>;
   }
+
+  // Tối ưu biến: Gọi hàm 1 lần để dùng chung
+  const cartTotal = getTotalCartAmount();
+
+  // Xác định xem giỏ hàng có trống hay không
+  const isCartEmpty = cartTotal === 0;
+
+  // LỚP KIỂM TRA: Xử lý sự kiện bấm nút Checkout
+  const handleCheckout = () => {
+    if (isCartEmpty) {
+      alert("Your cart is empty! Please add at least one item before checking out.");
+    } else {
+      navigate('/order');
+    }
+  };
 
   return (
     <div className='cart'>
       <div className="cart-items">
         <div className="cart-items-title">
-          <p>Món ăn</p>
-          <p>Tên</p>
-          <p>Giá</p>
-          <p>Số lượng</p>
-          <p>Tổng</p>
-          <p>Xóa</p>
+          <p>Items</p>
+          <p>Name</p>
+          <p>Price</p>
+          <p>Quantity</p>
+          <p>Total</p>
+          <p>Remove</p>
         </div>
         <br />
         <hr />
-        
-        {/* Dùng dấu ? (Optional Chaining) để code an toàn tuyệt đối */}
-        {food_list?.map((item, index) => {
-          if (cartItems?.[item._id] > 0) {
-            return (
-              <div key={index}>
-                <div className='cart-items-title cart-items-item'>
-                  <img src={item.image} alt="" />
-                  <p>{item.name}</p>
-                  <p>${item.price}</p>
-                  <p>{cartItems[item._id]}</p>
-                  <p>${item.price * cartItems[item._id]}</p>
-                  <p onClick={() => removeFromCart(item._id)} className='cross'>x</p>
+
+        {/* NẾU TRỐNG: Hiện thông báo. NẾU CÓ ĐỒ: Hiện danh sách */}
+        {isCartEmpty ? (
+          <div style={{ textAlign: 'center', margin: '40px 0', color: '#555' }}>
+            <h2>Your cart is empty 🛒</h2>
+            <p>Please go back to the homepage to choose some delicious items!</p>
+          </div>
+        ) : (
+          food_list?.map((item, index) => {
+            if (cartItems?.[item._id] > 0) {
+              return (
+                <div key={index}>
+                  <div className='cart-items-title cart-items-item'>
+                    <img src={url+"/images"+item.image} alt="" />
+                    <p>{item.name}</p>
+                    <p>${item.price}</p>
+                    <p>{cartItems[item._id]}</p>
+                    <p>${item.price * cartItems[item._id]}</p>
+                    <p onClick={() => removeFromCart(item._id)} className='cross'>x</p>
+                  </div>
+                  <hr />
                 </div>
-                <hr />
-              </div>
-            )
-          }
-          return null; // Thêm dòng này để tránh cảnh báo của React
-        })}
+              )
+            }
+            return null; // Bắt buộc return null để React không cảnh báo
+          })
+        )}
       </div>
-      
+
       <div className="cart-bottom">
         <div className="cart-total">
-          <h2>Tổng Giỏ Hàng</h2>
+          <h2>Cart Totals</h2>
           <div>
             <div className="cart-total-details">
-              <p>Tạm tính</p>
-              <p>${getTotalCartAmount()}</p>
+              <p>Subtotal</p>
+              <p>${cartTotal}</p>
             </div>
             <hr />
             <div className="cart-total-details">
-              <p>Phí giao hàng</p>
-              <p>${getTotalCartAmount() === 0 ? 0 : 2}</p>
+              <p>Delivery Fee</p>
+              <p>${isCartEmpty ? 0 : 2}</p>
             </div>
             <hr />
             <div className="cart-total-details">
-              <b>Tổng cộng</b>
-              <b>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
+              <b>Total</b>
+              <b>${isCartEmpty ? 0 : cartTotal + 2}</b>
             </div>
           </div>
-          <button onClick={() => navigate('/order')}>TIẾN HÀNH THANH TOÁN</button>
+          {/* Nút được gắn hàm handleCheckout thay vì navigate trực tiếp */}
+          <button onClick={handleCheckout}>PROCEED TO CHECKOUT</button>
         </div>
       </div>
     </div>
