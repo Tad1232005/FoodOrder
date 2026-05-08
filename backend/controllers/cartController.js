@@ -17,11 +17,11 @@ const addToCart = async (req, res) => {
 
         // Cập nhật lại giỏ hàng vào Database
         await userModel.findByIdAndUpdate(req.body.userId, { cartData });
-        res.json({ success: true, message: "Đã thêm vào giỏ hàng" });
+        res.json({ success: true, message: "Item added to cart successfully." });
 
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Lỗi khi thêm vào giỏ" });
+        res.json({ success: false, message: "Failed to add item to cart." });
     }
 }
 
@@ -37,11 +37,11 @@ const removeFromCart = async (req, res) => {
         }
 
         await userModel.findByIdAndUpdate(req.body.userId, { cartData });
-        res.json({ success: true, message: "Đã xóa khỏi giỏ hàng" });
+        res.json({ success: true, message: "Item removed from cart successfully." });
 
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Lỗi khi xóa khỏi giỏ" });
+        res.json({ success: false, message: "Failed to remove item from cart." });
     }
 }
 
@@ -53,7 +53,7 @@ const getCart = async (req, res) => {
         res.json({ success: true, cartData });
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Lỗi khi lấy dữ liệu giỏ hàng" });
+        res.json({ success: false, message: "Failed to fetch cart data." });
     }
 }
 

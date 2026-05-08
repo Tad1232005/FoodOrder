@@ -6,7 +6,7 @@ const authMiddleware = async (req, res, next) => {
     
     // Nếu không có token -> Đuổi về
     if (!token) {
-        return res.json({ success: false, message: "Không được phép, vui lòng đăng nhập lại!" });
+        return res.json({ success: false, message: "Unauthorized access. Please log in again." });
     }
     
     try {
@@ -20,7 +20,7 @@ const authMiddleware = async (req, res, next) => {
         next();
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Token không hợp lệ!" });
+        res.json({ success: false, message: "Invalid or expired token!" });
     }
 }
 
