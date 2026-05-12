@@ -13,7 +13,9 @@ const authMiddleware = async (req, res, next) => {
         // Giải mã token bằng chìa khóa bí mật trong file .env
         const token_decode = jwt.verify(token, process.env.JWT_SECRET);
         
-        // Nhét cái ID người dùng vừa giải mã được vào body để cartController dùng
+        // Gắn userId vào request (không phụ thuộc req.body)
+        req.userId = token_decode.id;
+        if (!req.body) req.body = {};
         req.body.userId = token_decode.id;
         
         // Cho phép đi tiếp vào Controller

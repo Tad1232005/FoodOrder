@@ -28,6 +28,12 @@ a {
   color: inherit;
 }
 
+.navbar {
+  /* giữ nguyên các style cũ, thêm 2 dòng này */
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0;

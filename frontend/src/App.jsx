@@ -1,31 +1,41 @@
-import React, { useState } from "react";
+import React from "react";
 import Navbar from "./components/Navbar/Navbar";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Cart from "./pages/Cart/Cart";
 import PlaceOrder from "./pages/PlaceOrder/PlaceOrder";
-import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
-import LoginPopup from "./components/LoginPopup/LoginPopup";
-const App = () => {
+import UserAuth from "./components/Login/UserAuth";
+import VerifyEmail from "./pages/Verify/VerifyEmail";
+import SetPassword from "./pages/SetPassword/SetPassword";
 
-const [showLogin,setShowLogin] = useState(false)
+
+const App = () => {
+  const location = useLocation();
+  const authRoutes = ["/login", "/verify-email", "/set-password"];
+  const isAuthPage = authRoutes.includes(location.pathname);
 
   return (
     <>
-    {showLogin?<LoginPopup setShowLogin={setShowLogin}/>:<></>}
-      <div className="app">
-        <Navbar setShowLogin={setShowLogin} />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/order" element={<PlaceOrder />} />
+      {!isAuthPage && <Navbar />}
+      {isAuthPage
+        ? <Routes>
+          <Route path="/login" element={<UserAuth />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/set-password" element={<SetPassword />} />   
 
         </Routes>
-      </div>
-      <Footer />
+        : <div className="app">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/order" element={<PlaceOrder />} />
+          </Routes>
+        </div>
+      }
+      {!isAuthPage && <Footer />}
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
