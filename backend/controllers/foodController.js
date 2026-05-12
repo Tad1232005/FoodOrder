@@ -52,4 +52,27 @@ const removeFood = async (req, res) =>{
         res.json({ success: false, message: "Error" });
     }
 }
-export { addFood, listFood,removeFood };
+// update food item (no image change)
+const updateFood = async (req, res) => {
+    try {
+        const { id, name, description, price, category } = req.body;
+        if (!id) return res.json({ success: false, message: "Missing id" });
+        const updated = await foodModel.findByIdAndUpdate(
+            id,
+            {
+                ...(name !== undefined ? { name } : {}),
+                ...(description !== undefined ? { description } : {}),
+                ...(price !== undefined ? { price } : {}),
+                ...(category !== undefined ? { category } : {}),
+            },
+            { new: true }
+        );
+        if (!updated) return res.json({ success: false, message: "Food not found" });
+        res.json({ success: true, message: "Food Updated", data: updated });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error" });
+    }
+}
+
+export { addFood, listFood, removeFood, updateFood };

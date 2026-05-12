@@ -1,0 +1,195 @@
+.verify-wrap {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #07070f;
+    position: relative;
+    overflow: hidden;
+}
+
+/* card giống login */
+.verify-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 40px 32px;
+    width: 360px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: popIn 0.4s ease;
+}
+
+.verify-card h2 {
+    margin-bottom: 6px;
+    font-size: 22px;
+}
+
+.verify-card p {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+/* OTP INPUT giống login vibe */
+.otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.otp-container input {
+    width: 48px;
+    height: 56px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    outline: none;
+    transition: 0.2s;
+}
+
+.otp-container input:focus {
+    border-color: #5b9bd5;
+    box-shadow: 0 0 12px rgba(91, 155, 213, 0.5);
+    transform: translateY(-2px);
+}
+
+/* button giống login */
+.verify-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #5b9bd5, #3a7abd);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.verify-btn:hover {
+    transform: translateY(-2px);
+}
+
+.verify-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* resend */
+.resend {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.resend span {
+    color: #5b9bd5;
+    cursor: pointer;
+}
+
+/* success overlay */
+.success-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.check {
+    font-size: 80px;
+    color: #4ade80;
+    animation: pop 0.4s ease;
+}
+
+/* Overlay thông báo thành công */
+.success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9); /* Nền trắng mờ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.success-box {
+    text-align: center;
+    padding: 30px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Biểu tượng tích xanh lá */
+.check-icon {
+    width: 70px;
+    height: 70px;
+    background: #28a745; /* Màu xanh lá đặc trưng */
+    color: white;
+    font-size: 35px;
+    line-height: 70px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    animation: popScale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Chữ tiêu đề xanh lá */
+.success-title {
+    color: #28a745;
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.blur-bg {
+    filter: blur(4px);
+    pointer-events: none;
+    transition: 0.3s;
+}
+
+/* animation */
+@keyframes pop {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

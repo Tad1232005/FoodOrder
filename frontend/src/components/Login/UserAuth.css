@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Shell ──────────────────────────────────────────────────────────────────
+   position: relative → bắt buộc để canvas absolute định vị đúng bên trong
+   min-height: 100vh  → đảm bảo luôn full màn hình
+   overflow: hidden   → canvas không tràn ra ngoài
+*/
+.ua-shell {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #07070f;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  padding: 24px 16px;
+  overflow: hidden;
+}
+
+/* ── Card ───────────────────────────────────────────────────────────────────
+   z-index: 10 → nằm trên canvas (z-index mặc định)
+   max-height + overflow-y → scroll được trên mobile khi content dài
+*/
+.ua-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 400px;
+  max-height: calc(100vh - 48px);
+  /* 48px = padding top+bottom của shell */
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 36px 32px 32px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: ua-fadein 0.35s ease;
+  /* Ẩn scrollbar nhưng vẫn scroll được */
+  scrollbar-width: none;
+}
+
+.ua-card::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes ua-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Hero: GIF + title ── */
+.ua-hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* Kích thước GIF trong card — chỉnh width/height ở đây */
+.ua-capoo {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: rgba(91, 155, 213, 0.1);
+  padding: 4px;
+  margin-bottom: 12px;
+}
+
+.ua-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 4px;
+  letter-spacing: -0.4px;
+}
+
+.ua-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.38);
+  margin: 0;
+}
+
+/* ── General error banner ── */
+.ua-general-err {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #f87171;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* ── Field ── */
+.ua-field {
+  margin-bottom: 16px;
+}
+
+.ua-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.ua-input-wrap {
+  position: relative;
+}
+
+.ua-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px 40px 10px 14px;
+  font-size: 14px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.ua-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.ua-input:focus {
+  border-color: rgba(91, 155, 213, 0.65);
+  background: rgba(91, 155, 213, 0.07);
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.12);
+}
+
+.ua-field--err .ua-input {
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+}
+
+.ua-err-msg {
+  display: block;
+  font-size: 12px;
+  color: #f87171;
+  margin-top: 5px;
+}
+
+/* ── Eye toggle ── */
+.ua-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 0.2s;
+  margin: 0;
+  letter-spacing: 0;
+  font-size: inherit;
+  text-transform: none;
+  width: auto;
+}
+
+.ua-eye:hover {
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0;
+  transform: translateY(-50%);
+}
+
+/* ── Submit button ── */
+.ua-btn {
+  width: 100%;
+  margin-top: 8px;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 12px;
+  background: linear-gradient(135deg, #3a7abd, #5b9bd5);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  box-shadow: 0 4px 20px rgba(58, 122, 189, 0.35);
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.ua-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  letter-spacing: 0.3px;
+}
+
+.ua-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.ua-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Spinner ── */
+.ua-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ua-spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes ua-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Switch link ── */
+.ua-switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.ua-switch span {
+  color: #5b9bd5;
+  cursor: pointer;
+  font-weight: 500;
+  margin: 0;
+  transition: color 0.2s;
+}
+
+.ua-switch span:hover {
+  color: #7fb3e0;
+}
+
+/* ── Responsive mobile ──────────────────────────────────────────────────────
+  Trên mobile không đủ chỗ, thu nhỏ padding + GIF
+  Shell dùng align-items: flex-start để card scroll từ trên xuống
+*/
+@media (max-width: 480px) {
+  .ua-shell {
+    align-items: flex-start;
+    padding: 16px 12px;
+  }
+
+  .ua-card {
+    max-height: none;
+    /* mobile thì scroll page thay vì scroll card */
+    padding: 24px 18px 20px;
+    border-radius: 18px;
+  }
+
+  .ua-capoo {
+    width: 70px;
+    height: 70px;
+  }
+
+  .ua-title {
+    font-size: 20px;
+  }
+}
