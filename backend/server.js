@@ -13,6 +13,8 @@ import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import authRoutes from "./routes/authRoutes.js";
 import 'dotenv/config';
+import dns from "node:dns/promises";
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 // app config
 const app = express();
