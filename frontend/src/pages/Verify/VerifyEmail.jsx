@@ -13,6 +13,10 @@ export default function VerifyEmail() {
     const [loading, setLoading] = useState(false);
     const [count, setCount] = useState(60);
     const [success, setSuccess] = useState(false);
+    
+    // Thêm state để quản lý thông báo lỗi có CSS thay vì dùng alert
+    const [errorMsg, setErrorMsg] = useState(""); 
+    
     const inputs = useRef([]);
 
     // Đếm ngược thời gian gửi lại mã
@@ -25,6 +29,7 @@ export default function VerifyEmail() {
     // Xử lý khi người dùng dán (paste) mã code
     const handlePaste = (e) => {
         e.preventDefault();
+        setErrorMsg(""); // Xóa lỗi khi dán mã mới
         const pasteData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
         if (!pasteData) return;
 
@@ -37,6 +42,8 @@ export default function VerifyEmail() {
     // Xử lý nhập từng số
     const handleChange = (value, index) => {
         if (!/^\d*$/.test(value)) return;
+        setErrorMsg(""); // Xóa lỗi khi người dùng gõ lại số
+
         const newOtp = [...otp];
         newOtp[index] = value.slice(-1);
         setOtp(newOtp);
@@ -56,9 +63,14 @@ export default function VerifyEmail() {
     // Gọi API xác thực
     const onVerifyHandler = async () => {
         const code = otp.join("");
-        if (code.length < 6) return;
+        if (code.length < 6) {
+            setErrorMsg("Please enter the full 6-digit code.");
+            return;
+        }
 
         setLoading(true);
+        setErrorMsg(""); // Reset trạng thái lỗi
+        
         try {
             const res = await axios.post(`${url}/api/user/verify-email`, { email, code });
 
@@ -75,7 +87,13 @@ export default function VerifyEmail() {
                 }, 2000);
             }
         } catch (err) {
-            alert("Invalid verification code");
+            // Xử lý Task 2: Phân biệt thông báo code hết hạn hoặc code sai
+            const backendMsg = err.response?.data?.message || "";
+            if (backendMsg.toLowerCase().includes("expire")) {
+                setErrorMsg("Verification code has expired. Please request a new one.");
+            } else {
+                setErrorMsg("Incorrect verification code. Please try again.");
+            }
         } finally {
             setLoading(false);
         }
@@ -87,6 +105,13 @@ export default function VerifyEmail() {
                 <h2>Verify Email</h2>
                 <p>Enter 6-digit code sent to <strong>{email}</strong></p>
 
+                {/* UI Thông báo lỗi được gọi bằng class CSS */}
+                {errorMsg && (
+                    <div className="error-msg-box">
+                        {errorMsg}
+                    </div>
+                )}
+
                 <div className="otp-container" onPaste={handlePaste}>
                     {otp.map((v, i) => (
                         <input
@@ -96,6 +121,7 @@ export default function VerifyEmail() {
                             maxLength={1}
                             onChange={(e) => handleChange(e.target.value, i)}
                             onKeyDown={(e) => handleKeyDown(e, i)}
+                            className={errorMsg ? "input-error" : ""} // Chuyển class viền đỏ khi có lỗi
                         />
                     ))}
                 </div>
