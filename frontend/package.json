@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "axios": "^1.16.1",
+>>>>>>> 190b2bd (Create place order feature and stripe payment integration ,done)
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.1"
