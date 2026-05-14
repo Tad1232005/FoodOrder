@@ -8,7 +8,7 @@ import Footer from "./components/Footer/Footer";
 import UserAuth from "./components/Login/UserAuth";
 import VerifyEmail from "./pages/Verify/VerifyEmail";
 import SetPassword from "./pages/SetPassword/SetPassword";
-
+import MyOrders from './pages/MyOrders/MyOrders';
 
 const App = () => {
   const location = useLocation();
@@ -30,6 +30,10 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/order" element={<PlaceOrder />} />
+            
+            {/* ĐÂY LÀ ROUTE CỦA BẠN VỪA ĐƯỢC THÊM VÀO */}
+            <Route path="/myorders" element={<MyOrders />} />
+            
           </Routes>
         </div>
       }
@@ -38,4 +42,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App;   

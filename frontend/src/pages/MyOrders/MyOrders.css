@@ -1,0 +1,140 @@
+/* Nền trắng, layout rộng rãi */
+.my-orders-wrap {
+    min-height: 100vh;
+    padding: 50px 20px;
+    background: #ffffff; /* Nền trắng giống trang Menu */
+    color: #333; /* Chữ xám đen */
+    display: flex;
+    justify-content: center;
+    font-family: inherit;
+}
+
+.my-orders-container {
+    width: 100%;
+    max-width: 1000px;
+}
+
+/* Tiêu đề đen đậm giống chữ "Top dishes near you" */
+.my-orders-container h2 {
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111; 
+}
+
+.loading-spinner, .no-orders {
+    text-align: center;
+    margin-top: 50px;
+    color: #666;
+    font-size: 18px;
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Thẻ đơn hàng: Nền trắng, viền nhạt, đổ bóng siêu nhẹ */
+.order-card {
+    background: #ffffff;
+    border: 1px solid #eaeaea; 
+    border-radius: 14px; 
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Bóng mờ như thẻ món ăn */
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.order-icon {
+    font-size: 35px;
+}
+
+.order-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin: 0 30px;
+}
+
+/* Tên món ăn xám đậm */
+.order-items {
+    flex: 2;
+    font-size: 15px;
+    color: #444; 
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+/* Tổng tiền và số lượng in đậm */
+.order-amount, .order-qty {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+}
+
+.order-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
+}
+
+/* Chấm trạng thái */
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.green { background: #4ade80; }
+.status-dot.orange { background: #f59e0b; }
+
+/* Nút Track Order màu cam đỏ nhạt phong cách app đồ ăn */
+.track-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #ff4c24;
+    background: #fff0ed; 
+    color: #ff4c24; 
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.track-btn:hover {
+    background: #ff4c24;
+    color: #ffffff;
+}
+
+/* Responsive cho màn hình điện thoại */
+@media (max-width: 768px) {
+    .order-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .order-info {
+        flex-direction: column;
+        align-items: flex-start;
+        margin: 0;
+        width: 100%;
+        gap: 10px;
+    }
+    .track-btn {
+        width: 100%;
+    }
+}
