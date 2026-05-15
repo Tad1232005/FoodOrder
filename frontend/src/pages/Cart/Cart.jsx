@@ -4,7 +4,7 @@ import { StoreContext } from '../../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-  const { cartItems, food_list, removeFromCart, getTotalCartAmount, url } = useContext(StoreContext);
+  const { cartItems, food_list, removeFromCart, getTotalCartAmount, url,token } = useContext(StoreContext);
   const navigate = useNavigate();
 
   // LỚP BẢO VỆ: Nếu dữ liệu chưa sẵn sàng, hiển thị chữ "Đang tải..."
@@ -20,6 +20,11 @@ const Cart = () => {
 
   // LỚP KIỂM TRA: Xử lý sự kiện bấm nút Checkout
   const handleCheckout = () => {
+    //THÊM ĐOẠN KIỂM TRA ĐĂNG NHẬP (Chặn lỗi nháy màn hình)
+    if (!token) {
+      alert("Vui lòng đăng nhập để tiến hành thanh toán!");
+      return; // Dừng hàm ngay lập tức, trình duyệt đứng im tại chỗ
+    }
     if (isCartEmpty) {
       alert("Your cart is empty! Please add at least one item before checking out.");
     } else {
