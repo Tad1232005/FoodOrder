@@ -12,6 +12,7 @@ import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import authRoutes from "./routes/authRoutes.js";
+import orderRouter from "./routes/orderRoute.js";
 import 'dotenv/config';
 import dns from "node:dns/promises";
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
@@ -33,7 +34,7 @@ app.use("/images", express.static('uploads'));
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/auth", authRoutes);
-
+app.use("/api/order", orderRouter);
 
 app.get("/", (req, res) => {
     res.send("API Working...");
