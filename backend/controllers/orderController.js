@@ -82,7 +82,17 @@ const verifyOrder = async (req, res) => {
     }
 }
 
-export { placeOrder, verifyOrder };
+//  người dùng đặt hàng của frontend
+const userOrders = async (req, res) => {
+    try {
+        const orders = await orderModel.find({ userId: req.body.userId });
+        res.json({ success: true, data: orders });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error" });
+    }
+}
+export { placeOrder, verifyOrder, userOrders };
 //Danh sách đơn hàng của admin
 const listOrders = async (req, res) => {
     try {
