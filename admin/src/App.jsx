@@ -10,6 +10,7 @@ import Login from './pages/Login/Login.jsx'
 import RequireAdmin from './components/Auth/RequireAdmin.jsx'
 import { useAdminSession } from './context/AdminSessionContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { url } from './config/config.js'
 
 function RequireNotStaff({ children }) {
   const { user } = useAdminSession()
@@ -40,7 +41,7 @@ const App = () => {
               </RequireNotStaff>
             }
           />
-          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders" element={<Orders url={url} />} />
           <Route
             path="/users"
             element={
