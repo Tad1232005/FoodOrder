@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 const PlaceOrder = () => {
   // Lấy các biến cần thiết từ StoreContext
-  const { getTotalCartAmount, token, food_list, cartItems, url } = useContext(StoreContext);
-  
+  const { getTotalCartAmount, token, food_list, cartItems, url, clearCart } = useContext(StoreContext);
+
   //  Tạo state lưu trữ thông tin địa chỉ người dùng nhập
   const [data, setData] = useState({
     firstName: "",
@@ -19,6 +19,7 @@ const PlaceOrder = () => {
     phone: ""
   });
 
+  const [paymentMethod, setPaymentMethod] = useState("stripe");
   const navigate = useNavigate();
 
   //  Hàm cập nhật dữ liệu khi người dùng gõ vào ô input
@@ -31,7 +32,7 @@ const PlaceOrder = () => {
   // Hàm xử lý logic đặt hàng và gọi Stripe
   const placeOrder = async (event) => {
     event.preventDefault();
-    
+
     // Đóng gói các món ăn đang có trong giỏ hàng
     let orderItems = [];
     food_list.forEach((item) => {
@@ -51,14 +52,28 @@ const PlaceOrder = () => {
 
     // Gọi API xuống Backend
     try {
-      let response = await axios.post(url + "/api/order/place", orderData, { headers: { token } });
-      if (response.data.success) {
-        const { session_url } = response.data;
-        // Chuyển hướng người dùng sang giao diện quẹt thẻ của Stripe
-        window.location.replace(session_url);
+      if (paymentMethod === "stripe") {
+        //Luồng Stripe
+        let response = await axios.post(url + "/api/order/place", orderData, { headers: { token } });
+        if (response.data.success) {
+          const { session_url } = response.data;
+          // Chuyển hướng người dùng sang giao diện quẹt thẻ của Stripe
+          window.location.replace(session_url);
+        } else {
+          alert("Error Placing Order");
+        }
       } else {
-        alert("Error Placing Order");
+        // Luồng COD, không cần Stripe
+        let response = await axios.post(url + "/api/order/placecod", orderData, { headers: { token } });
+        if (response.data.success) {
+          clearCart();
+          sessionStorage.setItem("justOrdered", "true");
+          navigate("/myorders"); // Chuyển thẳng sang trang theo dõi đơn
+        } else {
+          alert("Error Placing Order");
+        }
       }
+
     } catch (error) {
       console.error(error);
       alert("Something went wrong!");
@@ -127,7 +142,36 @@ const PlaceOrder = () => {
         </div>
 
         {/* 3. Nút chốt đơn hàng */}
-        <button className="proceed-btn" type='submit'>PROCEED TO PAYMENT</button>
+        <div className="payment-method">
+          <p>Payment Method</p>
+          <div className="payment-options">
+            <label className={paymentMethod === "stripe" ? "active" : ""}>
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="stripe"
+                checked={paymentMethod === "stripe"}
+                onChange={() => setPaymentMethod("stripe")}
+              />
+              Credit / Debit Card (Stripe)
+            </label>
+            <label className={paymentMethod === "cod" ? "active" : ""}>
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="cod"
+                checked={paymentMethod === "cod"}
+                onChange={() => setPaymentMethod("cod")}
+              />
+              Cash on Delivery (COD)
+            </label>
+          </div>
+        </div>
+
+        {/*Nút submit — tự đổi chữ theo phương thức */}
+        <button className="proceed-btn" type='submit'>
+          {paymentMethod === "stripe" ? "PROCEED TO PAYMENT" : "PLACE ORDER"}
+        </button>
 
       </div>
     </form>

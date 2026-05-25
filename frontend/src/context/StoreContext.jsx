@@ -65,11 +65,15 @@ const StoreContextProvider = (props) => {
         setFoodList(response.data.data);
     };
 
-    const loadCartData = async (token) => {
+    // SỬA TẠI ĐÂY: Thêm tham số `localCart` để gửi giỏ hàng tạm lên Backend gộp dữ liệu
+    const loadCartData = async (authToken, localCart = {}) => {
         try {
-            const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } });
+            const response = await axios.post(
+                url + "/api/cart/get",
+                { guestCart: localCart }, // Gửi kèm giỏ hàng hiện tại trên giao diện lên
+                { headers: { token: authToken } }
+            );
             setCartItems(response.data?.cartData || response.data?.data?.cart || {});
-
         } catch (error) {
             console.error("Error loading cart:", error);
         }
@@ -78,15 +82,24 @@ const StoreContextProvider = (props) => {
     useEffect(() => {
         async function fetchInitialData() {
             await fetchFoodList();
-            if (localStorage.getItem("token")) {
-                setToken(localStorage.getItem("token"));
-                await loadCartData(localStorage.getItem("token"));
+            const storedToken = localStorage.getItem("token");
+            if (storedToken) {
+                setToken(storedToken);
+                // Nếu vừa đặt hàng xong thì không load lại cart
+                const justOrdered = sessionStorage.getItem("justOrdered");
+                if (justOrdered) {
+                    sessionStorage.removeItem("justOrdered"); // xóa flag
+                } else {
+                    await loadCartData(storedToken); // Khi F5, localCart trống nên không cần truyền
+                }
             }
         }
-
         fetchInitialData();
     }, []);
 
+    const clearCart = () => {
+        setCartItems({});
+    };
     const contextValue = {
         food_list,
         cartItems,
@@ -97,11 +110,12 @@ const StoreContextProvider = (props) => {
         url,
         token,
         setToken,
+        loadCartData, // SỬA TẠI ĐÂY: Xuất hàm này ra để file Login có thể gọi được ngay lập tức!
+        clearCart,
         // 2. ĐÃ TRUYỀN SEARCH TERM VÀO CONTEXT VALUE
         searchTerm,
         setSearchTerm,
     };
-
     return (
         <StoreContext.Provider value={contextValue}>
             {props.children}

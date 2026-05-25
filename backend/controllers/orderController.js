@@ -7,8 +7,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // API 1: Đặt hàng từ Frontend và tạo link thanh toán Stripe
 const placeOrder = async (req, res) => {
-    const frontend_url = "http://localhost:5173"; 
-    
+    const frontend_url = "http://localhost:5173";
+
     try {
         // 1. Tạo đơn hàng mới lưu vào MongoDB (mặc định payment: false)
         const newOrder = new orderModel({
@@ -18,9 +18,9 @@ const placeOrder = async (req, res) => {
             address: req.body.address
         });
         await newOrder.save();
-        
-        // 2. Xóa sạch giỏ hàng của user sau khi đã lên đơn
-        await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+
+        // 2. Xóa sạch giỏ hàng của user sau khi đã lên đơn 
+        // await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
 
         // 3. Chuẩn bị dữ liệu mảng sản phẩm (line_items) để gửi cho Stripe
         const line_items = req.body.items.map((item) => ({
@@ -62,6 +62,28 @@ const placeOrder = async (req, res) => {
         res.json({ success: false, message: "Error" });
     }
 }
+// API: Đặt hàng COD (không cần Stripe)
+const placeOrderCOD = async (req, res) => {
+    try {
+        const newOrder = new orderModel({
+            userId: req.body.userId,
+            items: req.body.items,
+            amount: req.body.amount,
+            address: req.body.address,
+            paymentMethod: "cod",
+            payment: false  // chưa trả tiền, chờ shipper thu
+        });
+        await newOrder.save();
+
+        // Xóa giỏ hàng như Stripe
+        await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+
+        res.json({ success: true, message: "Order placed" });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error" });
+    }
+}
 
 // API 2: Xác thực thanh toán sau khi Stripe trả về
 const verifyOrder = async (req, res) => {
@@ -70,9 +92,11 @@ const verifyOrder = async (req, res) => {
         // Nếu URL trả về success=true -> Cập nhật DB thành đã thanh toán (true)
         if (success === "true") {
             await orderModel.findByIdAndUpdate(orderId, { payment: true });
+            // ← Chỉ xóa cart khi thanh toán thành công
+            const order = await orderModel.findById(orderId);
             res.json({ success: true, message: "Paid" });
         } else {
-            // Nếu khách hủy thanh toán -> Xóa đơn hàng nháp đó đi
+            // Hủy → xóa order rác, cart trong DB vẫn còn nguyên
             await orderModel.findByIdAndDelete(orderId);
             res.json({ success: false, message: "Not Paid" });
         }
@@ -85,20 +109,26 @@ const verifyOrder = async (req, res) => {
 //  người dùng đặt hàng của frontend
 const userOrders = async (req, res) => {
     try {
-        const orders = await orderModel.find({ userId: req.body.userId });
+        const orders = await orderModel.find({
+            userId: req.body.userId,
+            $or: [
+                { payment: true },                    // đã thanh toán
+                { paymentMethod: "cod" }              // COD không cần payment true
+            ]
+        });
         res.json({ success: true, data: orders });
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: "Error" });
     }
 }
-export { placeOrder, verifyOrder, userOrders };
+
 //Danh sách đơn hàng của admin
 const listOrders = async (req, res) => {
     try {
         const orders = await orderModel.find({});
         res.json({ success: true, data: orders });
-}   catch (error) {
+    } catch (error) {
         console.log(error);
         res.json({ success: false, message: "Error" });
     }
@@ -107,7 +137,17 @@ const listOrders = async (req, res) => {
 //api để cập nhật trạng thái đơn hàng
 const updateStatus = async (req, res) => {
     try {
-        await orderModel.findByIdAndUpdate(req.body.orderId, { status: req.body.status });
+        const updateData = { status: req.body.status };
+
+        // Nếu admin đánh dấu "Delivered" → tự động set payment = true cho COD
+        if (req.body.status === "Delivered") {
+            const order = await orderModel.findById(req.body.orderId);
+            if (order.paymentMethod === "cod") {
+                updateData.payment = true;
+            }
+        }
+
+        await orderModel.findByIdAndUpdate(req.body.orderId, updateData);
         res.json({ success: true, message: "Status updated" });
     } catch (error) {
         console.log(error);
@@ -115,4 +155,37 @@ const updateStatus = async (req, res) => {
     }
 }
 
-export { listOrders, updateStatus }
+// Mark as Paid cho COD
+const markOrderAsPaid = async (req, res) => {
+    try {
+        const order = await orderModel.findById(req.body.orderId);
+        if (!order) return res.json({ success: false, message: "Order not found" });
+        if (order.paymentMethod !== "cod") return res.json({ success: false, message: "Only COD orders" });
+
+        await orderModel.findByIdAndUpdate(req.body.orderId, { payment: true });
+        res.json({ success: true, message: "Marked as paid" });
+    } catch (error) {
+        res.json({ success: false, message: "Error" });
+    }
+};
+
+// Xóa đơn
+const deleteOrder = async (req, res) => {
+    try {
+        await orderModel.findByIdAndDelete(req.body.orderId);
+        res.json({ success: true, message: "Deleted" });
+    } catch (error) {
+        res.json({ success: false, message: "Error" });
+    }
+};
+
+export {
+    placeOrder,
+    placeOrderCOD,
+    verifyOrder,
+    userOrders,
+    listOrders,
+    updateStatus,
+    markOrderAsPaid,
+    deleteOrder
+};
