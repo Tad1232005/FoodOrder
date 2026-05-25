@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const VerifyOrder = () => {
     // 1. Lấy success và orderId từ thanh địa chỉ (URL)
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const success = searchParams.get("success");
     const orderId = searchParams.get("orderId");
 

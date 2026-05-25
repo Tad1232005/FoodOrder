@@ -11,10 +11,10 @@ const MyOrders = () => {
 
     // Hàm gọi API lấy danh sách đơn hàng của user
     const fetchOrders = async () => {
-        if (!token) {
-            setLoading(false);
-            return;
-        }
+        // if (!token) {
+        //     setLoading(false);
+        //     return;
+        // }
         
         try {
             const response = await axios.post(url + "/api/order/userorders", {}, { headers: { token } });
