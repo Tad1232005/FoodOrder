@@ -10,7 +10,7 @@ const adminAuth = async (req, res, next) => {
         const token_decode = jwt.verify(token, process.env.JWT_SECRET);
         const user = await userModel.findById(token_decode.id).select("_id role email name");
         if (!user) return res.json({ success: false, message: "User not found" });
-        if (user.role !== "admin") return res.json({ success: false, message: "Forbidden" });
+        if (user.role !== "admin" && user.role !== "staff") return res.json({ success: false, message: "Forbidden" });
         req.admin = user;
         next();
     } catch (error) {

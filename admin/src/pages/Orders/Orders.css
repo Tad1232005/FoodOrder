@@ -1,43 +1,227 @@
-.order-item{
+/* ── Order item layout ── */
+.order-item {
     display: grid;
-    grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr;
-    align-items: start;
-    gap: 30px;
+    grid-template-columns: 40px 2fr 0.8fr 120px 140px 120px;
+    align-items: center;
+    gap: 16px;
     border: 1px solid tomato;
-    padding: 20px;
-    margin: 30px 0px;
+    padding: 16px 20px;
+    margin: 16px 0;
     font-size: 12px;
     color: #505050;
-}
-.order-item-food, .order-item-name{
-    font-weight: 600;
-}
-.order-item-name{
-    margin-top: 30px;
-    margin-bottom: 5px;
-}
-.order-item-address{
-    margin-top: 10px;
-}
-.order-item select{
-    background-color: #ffe8e4;
-    border: 1px solid tomato;
-    width: max(10px, 135px);
-    padding: 10px;
-    outline: none;
+    border-radius: 8px;
+    background: #fff;
 }
 
-@media (max-width: 1000px) {
-    .order-item{
-        font-size: 12px;
-        grid-template-columns: 0.5fr 2fr 1fr;
-        padding: 12px 8px;
+.order-item img { width: 40px; }
+
+.order-item-food,
+.order-item-name { font-weight: 600; }
+
+.order-item-name {
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+.order-item-address {
+    margin-top: 6px;
+    color: #777;
+}
+
+.order-item-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.order-date { font-size: 11px; color: #aaa; }
+
+/* Status dropdown */
+.order-item select {
+    background-color: #ffe8e4;
+    border: 1px solid tomato;
+    width: 100%;
+    padding: 8px;
+    outline: none;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #333;
+}
+
+/* ── Badges ── */
+.order-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+}
+
+.badge-method,
+.badge-payment {
+    padding: 4px 0;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.badge-cod    { background: #fff3cd; color: #856404; }
+.badge-stripe { background: #cce5ff; color: #004085; }
+.badge-paid   { background: #d4edda; color: #155724; }
+.badge-unpaid { background: #f8d7da; color: #721c24; }
+
+/* ── Action buttons ── */
+.order-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.btn-mark-paid {
+    padding: 7px 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.btn-mark-paid:hover { background: #218838; }
+
+.btn-delete-order {
+    background: #fff0f0;
+    border: 1px solid #ffcccc;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+    color: #e74c3c;
+}
+
+.btn-delete-order:hover { background: #ffe0e0; }
+
+.order-unpaid-stripe {
+    border-left: 4px solid #f5c6cb;
+    opacity: 0.8;
+}
+
+/* ── Filter bar ── */
+.order-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.order-search {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 180px;
+    font-size: 13px;
+    background: #fff;
+    color: #333;
+}
+
+.order-filter-bar select,
+.order-filter-bar input[type="date"] {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #fff;
+    color: #333;
+}
+
+.btn-reset-filter {
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f5f5f5;
+    color: #333;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-reset-filter:hover { background: #e0e0e0; }
+
+.order-count {
+    margin-left: auto;
+    font-size: 13px;
+    color: #888;
+}
+
+.no-orders { text-align: center; color: #888; padding: 40px; }
+
+/* ════════════════════════════
+   DARK MODE — data-theme="dark"
+   ════════════════════════════ */
+[data-theme="dark"] .order-item {
+    background: #1e1e1e;
+    border-color: #c0392b;
+    color: #ccc;
+}
+
+[data-theme="dark"] .order-item-address { color: #888; }
+[data-theme="dark"] .order-date { color: #666; }
+
+[data-theme="dark"] .order-item select {
+    background-color: #2a1a1a;
+    border-color: #c0392b;
+    color: #eee;
+}
+
+/* Filter bar dark */
+[data-theme="dark"] .order-search,
+[data-theme="dark"] .order-filter-bar select,
+[data-theme="dark"] .order-filter-bar input[type="date"] {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #eee;
+}
+
+[data-theme="dark"] .btn-reset-filter {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #eee;
+}
+
+[data-theme="dark"] .btn-reset-filter:hover { background: #333; }
+[data-theme="dark"] .order-count { color: #666; }
+
+/* Buttons dark */
+[data-theme="dark"] .btn-delete-order {
+    background: #2a1a1a;
+    border-color: #c0392b;
+    color: #e74c3c;
+}
+
+[data-theme="dark"] .btn-delete-order:hover { background: #3a1a1a; }
+
+/* Badges dark — giữ màu gốc vẫn đọc được */
+[data-theme="dark"] .badge-cod    { background: #3d2e00; color: #ffc107; }
+[data-theme="dark"] .badge-stripe { background: #002a4a; color: #7ec8f7; }
+[data-theme="dark"] .badge-paid   { background: #0d2b14; color: #5cb85c; }
+[data-theme="dark"] .badge-unpaid { background: #2b0d0d; color: #e74c3c; }
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+    .order-item {
+        grid-template-columns: 40px 1fr 1fr;
+        gap: 10px;
     }
-    .order-item select{
-        padding: 5px;
-        font-size: 12px;
-    }
-    .order-item img{
-        width: 40px;
+
+    .order-item-summary,
+    .order-badges,
+    .order-item select,
+    .order-actions {
+        grid-column: 2 / -1;
     }
 }

@@ -15,15 +15,46 @@ import authRoutes from "./routes/authRoutes.js";
 import orderRouter from "./routes/orderRoute.js";
 import 'dotenv/config';
 import dns from "node:dns/promises";
+import startCronJobs from "./utils/cronJob.js";
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 // app config
 const app = express();
 const port = 4000;
 
+const cleanNoSQL = (obj) => {
+    if (obj && typeof obj === 'object') {
+        for (const key in obj) {
+            if (key.startsWith('$') || key.includes('.')) {
+                delete obj[key];
+            } else if (typeof obj[key] === 'object') {
+                cleanNoSQL(obj[key]);
+            }
+        }
+    }
+};
+
+const customMongoSanitize = (req, res, next) => {
+    cleanNoSQL(req.body);
+    cleanNoSQL(req.params);
+    if (req.query) {
+        const queryCopy = { ...req.query };
+        cleanNoSQL(queryCopy);
+        Object.defineProperty(req, 'query', {
+            value: queryCopy,
+            writable: true,
+            configurable: true
+        });
+    }
+    next();
+};
+
 // middleware
 app.use(express.json());
 app.use(cors());
+
+// Kích hoạt màng lọc
+app.use(customMongoSanitize);
 
 // db connection
 connectDB();
@@ -43,4 +74,5 @@ app.get("/", (req, res) => {
 // listen
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
+    startCronJobs();
 });

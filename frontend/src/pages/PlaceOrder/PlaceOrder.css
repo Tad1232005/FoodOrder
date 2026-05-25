@@ -106,6 +106,38 @@
   background-color: #ff4a33;
 }
 
+/* Paymentmethod */
+.payment-method {
+  margin-top: 20px;
+}
+
+.payment-method p {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.payment-options label.active {
+  border-color: tomato;
+  background-color: #fff4f4;
+}
+
 @media (max-width: 800px) {
   .place-order {
     flex-direction: column;

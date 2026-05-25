@@ -196,14 +196,18 @@ function StarCanvas({ rootRef }) {
 
 // ─── CapooFollower: con capoo chạy theo chuột ─────────────────────────────
 // dùng lerp (linear interpolation) để chuyển động mượt, không teleport ngay
+// ─── CapooFollower: con capoo chạy theo chuột ─────────────────────────────
+// ✅ FIX: dùng imgRef thao tác DOM trực tiếp thay vì setState
+// → GIF không bị re-mount → không restart → loop mãi mãi
 function CapooFollower({ rootRef }) {
-  const [pos, setPos] = useState({ x: -100, y: -100, angle: 0, flipX: false });
+  const imgRef = useRef(null);
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!root) return;
+    const img = imgRef.current;
+    if (!root || !img) return;
 
-    let fx = 0, fy = 0, prevFx = 0; // vị trí hiện tại của follower
+    let fx = 0, fy = 0, prevFx = 0;
     let raf;
     let mouse = { x: 0, y: 0 };
 
@@ -216,14 +220,18 @@ function CapooFollower({ rootRef }) {
 
     function animate() {
       prevFx = fx;
-      // lerp: di chuyển 9% khoảng cách còn lại mỗi frame — tăng để đuổi nhanh hơn
       fx += (mouse.x - fx) * 0.09;
-      fy += (mouse.y - 40 - fy) * 0.09; // -40 để capoo hơi lên trên chuột
+      fy += (mouse.y - 40 - fy) * 0.09;
+
       const dx = fx - prevFx;
-      // nghiêng theo hướng di chuyển ngang — tăng 2.2 để nghiêng nhiều hơn
       const angle = Math.max(-28, Math.min(28, dx * 2.2));
-      const flipX = dx < -1; // lật ảnh khi đi sang trái
-      setPos({ x: fx, y: fy, angle, flipX });
+      const flipX = dx < -1;
+
+      // ✅ Thao tác DOM trực tiếp — không trigger re-render → GIF không restart
+      img.style.left = `${fx}px`;
+      img.style.top = `${fy}px`;
+      img.style.transform = `translate(-50%, -50%) scaleX(${flipX ? -1 : 1}) rotate(${angle}deg)`;
+
       raf = requestAnimationFrame(animate);
     }
     raf = requestAnimationFrame(animate);
@@ -236,20 +244,21 @@ function CapooFollower({ rootRef }) {
 
   return (
     <img
+      ref={imgRef}
       src={capooGif}
       alt=""
       style={{
         position: "absolute",
-        left: pos.x,
-        top: pos.y,
-        width: 65,  // kích thước follower — chỉnh ở đây
+        left: -100,   // ẩn lúc đầu, chờ mouse move
+        top: -100,
+        width: 65,
         height: 65,
         objectFit: "contain",
-        transform: `translate(-50%, -50%) scaleX(${pos.flipX ? -1 : 1}) rotate(${pos.angle}deg)`,
         zIndex: 3,
         pointerEvents: "none",
         userSelect: "none",
         borderRadius: "50%",
+        // ✅ KHÔNG có transform ở đây — để useEffect set trực tiếp
       }}
     />
   );
@@ -257,7 +266,7 @@ function CapooFollower({ rootRef }) {
 
 // ─── LoginForm ─────────────────────────────────────────────────────────────
 function LoginForm({ onSwitch }) {
-  const { url, setToken } = useContext(StoreContext);
+  const { url, setToken, cartItems, loadCartData } = useContext(StoreContext);
   const navigate = useNavigate();
   const email = useField();
   const password = useField();
@@ -287,6 +296,10 @@ function LoginForm({ onSwitch }) {
         //Đã verify email
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
+
+        // SỬA TẠI ĐÂY: Gọi đồng bộ giỏ hàng NGAY LẬP TỨC trước khi chuyển trang
+        // Truyền token mới nhận kèm theo danh sách sản phẩm đang có trên màn hình lên Server gộp dữ liệu
+        await loadCartData(res.data.token, cartItems);
         navigate("/"); // về trang chủ sau khi login thành công
       }
       else if (res.data.needVerify) {
