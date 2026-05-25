@@ -9,6 +9,9 @@ const StoreContextProvider = (props) => {
     const url = "http://localhost:4000";
     const [token, setToken] = useState();
     const [food_list, setFoodList] = useState([]);
+    
+    // 1. ĐÃ THÊM STATE TÌM KIẾM Ở ĐÂY
+    const [searchTerm, setSearchTerm] = useState("");
 
     const addToCart = async (itemId) => {
         setCartItems((prev) => ({
@@ -109,6 +112,9 @@ const StoreContextProvider = (props) => {
         setToken,
         loadCartData, // SỬA TẠI ĐÂY: Xuất hàm này ra để file Login có thể gọi được ngay lập tức!
         clearCart,
+        // 2. ĐÃ TRUYỀN SEARCH TERM VÀO CONTEXT VALUE
+        searchTerm,
+        setSearchTerm,
     };
     return (
         <StoreContext.Provider value={contextValue}>
