@@ -1,0 +1,49 @@
+.dashboard {
+  padding: 24px;
+  background: #f5f7fb;
+  min-height: 100vh;
+}
+
+.dashboard-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.dashboard-card {
+  border-radius: 18px !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  transition: 0.3s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+}
+
+.chart-card {
+  border-radius: 18px !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.table-card {
+  border-radius: 18px !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.section-margin {
+  margin-top: 24px;
+}
+
+.card-growth {
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.growth-up {
+  color: #52c41a;
+}
+
+.growth-down {
+  color: #ff4d4f;
+}

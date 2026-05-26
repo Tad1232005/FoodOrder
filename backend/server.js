@@ -16,6 +16,7 @@ import orderRouter from "./routes/orderRoute.js";
 import 'dotenv/config';
 import dns from "node:dns/promises";
 import startCronJobs from "./utils/cronJob.js";
+import adminRoutes from "./routes/adminRoutes.js";
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 // app config
@@ -66,7 +67,7 @@ app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/order", orderRouter);
-
+app.use("/api/admin", adminRoutes);
 app.get("/", (req, res) => {
     res.send("API Working...");
 });

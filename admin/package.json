@@ -10,11 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.16.0",
+    "@ant-design/icons": "^6.2.3",
+    "antd": "^6.4.3",
+    "axios": "^1.16.1",
+    "bootstrap": "^5.3.8",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.15.0",
-    "react-toastify": "^11.1.0"
+    "react-toastify": "^11.1.0",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
