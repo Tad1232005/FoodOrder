@@ -1,8 +1,16 @@
-import { useEffect, useState } from "react";
+// ======================================================
+// FILE:
+// admin/src/pages/Dashboard/Dashboard.jsx
+// ======================================================
+
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import axios from "axios";
 
-import "./Dashboard.css";
+import dayjs from "dayjs";
 
 import {
   Card,
@@ -10,7 +18,11 @@ import {
   Row,
   Statistic,
   Table,
+  DatePicker,
+  Progress,
+  Empty,
   Tag,
+  Select,
 } from "antd";
 
 import {
@@ -18,160 +30,267 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
   AppstoreOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 
 import {
   ResponsiveContainer,
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
 } from "recharts";
 
+import "./Dashboard.css";
+
+const { Option } = Select;
+
 const Dashboard = () => {
+
+  // ======================================================
+  // DASHBOARD STATS STATE
+  // ======================================================
 
   const [stats, setStats] =
     useState({
-      totalUsers: 0,
-      totalFoods: 0,
-      totalOrders: 0,
-      totalRevenue: 0,
 
-      revenueGrowth: 0,
-      orderGrowth: 0,
-      userGrowth: 0,
-      foodGrowth: 0,
+      totalUsers: 0,
+
+      totalFoods: 0,
+
+      totalOrders: 0,
+
+      filteredRevenue: 0,
+
+      recentOrders: [],
+
+      revenueChart: [],
+
+      topFoods: [],
+
+      revenuePercent: null,
     });
 
-  const [revenueData, setRevenueData] =
-    useState([]);
+  // ======================================================
+  // FILTER STATE
+  // ======================================================
 
-  const [recentOrders, setRecentOrders] =
-    useState([]);
+  const [filterType, setFilterType] =
+    useState("month");
+
+  const [selectedDate, setSelectedDate] =
+    useState(dayjs());
+
+  // ======================================================
+  // FETCH DASHBOARD WHEN FILTER CHANGES
+  // ======================================================
 
   useEffect(() => {
 
-    const fetchDashboard =
-      async () => {
-
-        try {
-
-          const res =
-            await axios.get(
-              "http://localhost:4000/api/admin/dashboard"
-            );
-
-          if (res.data.success) {
-
-            setStats({
-              totalUsers:
-                res.data.totalUsers,
-
-              totalFoods:
-                res.data.totalFoods,
-
-              totalOrders:
-                res.data.totalOrders,
-
-              totalRevenue:
-                res.data.totalRevenue,
-
-              revenueGrowth:
-                res.data.revenueGrowth,
-
-              orderGrowth:
-                res.data.orderGrowth,
-
-              userGrowth:
-                res.data.userGrowth,
-
-              foodGrowth:
-                res.data.foodGrowth,
-            });
-
-            setRevenueData(
-              res.data.revenueChart || []
-            );
-
-            setRecentOrders(
-              res.data.recentOrders || []
-            );
-          }
-
-        } catch (error) {
-
-          console.log(error);
-        }
-      };
-
     fetchDashboard();
 
-  }, []);
+  }, [filterType, selectedDate]);
+
+  // ======================================================
+  // FETCH DASHBOARD DATA
+  // ======================================================
+
+  const fetchDashboard =
+    async () => {
+
+      try {
+
+        const res =
+          await axios.get(
+            "http://localhost:4000/api/admin/dashboard",
+            {
+              params: {
+
+                filterType,
+
+                date:
+                  selectedDate.format(
+                    "YYYY-MM-DD"
+                  ),
+              },
+            }
+          );
+
+        // ==================================================
+        // IF API SUCCESS
+        // ==================================================
+
+        if (res.data.success) {
+
+          setStats(res.data);
+        }
+
+      } catch (error) {
+
+        console.log(error);
+      }
+    };
+
+  // ======================================================
+  // TABLE COLUMNS
+  // ======================================================
 
   const columns = [
+
+    // ====================================================
+    // CUSTOMER
+    // ====================================================
+
     {
       title: "Customer",
       dataIndex: "customer",
     },
 
+    // ====================================================
+    // ORDER DATE
+    // ====================================================
+
     {
-      title: "Amount",
-      dataIndex: "amount",
+      title: "Date",
+      dataIndex: "date",
+
+      align: "right",
     },
+
+    // ====================================================
+    // ORDER STATUS
+    // ====================================================
 
     {
       title: "Status",
       dataIndex: "status",
 
-      render: (status) => {
+      render: (status) => (
 
-        let color = "blue";
+        <Tag color="blue">
+          {status}
+        </Tag>
+      ),
+    },
 
-        if (status === "Delivered") {
-          color = "green";
-        }
+    // ====================================================
+    // PAYMENT STATUS
+    // ====================================================
 
-        if (
-          status === "Food Processing"
-        ) {
-          color = "orange";
-        }
+    {
+      title: "Payment",
+      dataIndex: "payment",
 
-        return (
-          <Tag color={color}>
-            {status}
-          </Tag>
-        );
-      },
+      align: "center",
+
+      render: (payment) => (
+
+        payment ? (
+
+          <CheckCircleOutlined
+            style={{
+              color: "#22c55e",
+              fontSize: 20,
+            }}
+          />
+
+        ) : (
+
+          <CloseCircleOutlined
+            style={{
+              color: "#ef4444",
+              fontSize: 20,
+            }}
+          />
+        )
+      ),
+    },
+
+    // ====================================================
+    // TOTAL AMOUNT
+    // ====================================================
+
+    {
+      title: "Amount",
+      dataIndex: "amount",
+
+      align: "right",
     },
   ];
 
-  const tableData =
-    recentOrders.map((order) => ({
-      key: order._id,
-
-      customer:
-        order.address.firstName +
-        " " +
-        order.address.lastName,
-
-      amount:
-        "$" + order.amount,
-
-      status:
-        order.status,
-    }));
-
   return (
+
     <div className="dashboard">
 
-      <h1 className="dashboard-title">
-        Analytics Dashboard
-      </h1>
+      {/* ================================================== */}
+      {/* DASHBOARD HEADER */}
+      {/* ================================================== */}
+
+      <div className="dashboard-top">
+
+        {/* TITLE */}
+
+        <div>
+
+          <h1>
+            Analytics Dashboard
+          </h1>
+
+          <p>
+            Revenue statistics overview
+          </p>
+
+        </div>
+
+        {/* ================================================= */}
+        {/* TIME FILTER */}
+        {/* ================================================= */}
+
+        <div className="filter-bar">
+
+          {/* FILTER TYPE DROPDOWN */}
+
+          <Select
+            value={filterType}
+            onChange={setFilterType}
+            className="filter-select"
+            dropdownClassName="dashboard-dropdown"
+          >
+
+            <Option value="day">
+              Daily
+            </Option>
+
+            <Option value="month">
+              Monthly
+            </Option>
+
+            <Option value="year">
+              Yearly
+            </Option>
+
+          </Select>
+
+          {/* DATE PICKER */}
+
+          <DatePicker
+            picker={filterType}
+            value={selectedDate}
+            onChange={setSelectedDate}
+            allowClear={false}
+            className="filter-date"
+          />
+
+        </div>
+
+      </div>
+
+      {/* ================================================== */}
+      {/* STATISTIC CARDS */}
+      {/* ================================================== */}
 
       <Row gutter={[20, 20]}>
 
@@ -179,47 +298,54 @@ const Dashboard = () => {
 
         <Col xs={24} md={12} lg={6}>
 
-          <Card
-            bordered={false}
-            className="dashboard-card"
-          >
+          <Card className="dash-card">
 
             <Statistic
               title="Revenue"
               value={
-                stats.totalRevenue
+                Number(
+                  stats.filteredRevenue || 0
+                )
               }
               precision={2}
-              prefix={
-                <DollarOutlined />
-              }
+              prefix={<DollarOutlined />}
             />
 
-            <p
-              className={`card-growth ${
-                stats.revenueGrowth >= 0
-                  ? "growth-up"
-                  : "growth-down"
-              }`}
-            >
+            {/* REVENUE PERCENT */}
 
-              {stats.revenueGrowth >= 0 ? (
-                <ArrowUpOutlined />
-              ) : (
-                <ArrowDownOutlined />
-              )}
+            {
+              stats.revenuePercent !==
+                null &&
+              Number(
+                stats.revenuePercent
+              ) !== 0 && (
 
-              {" "}
+                <div
+                  className={
+                    Number(
+                      stats.revenuePercent
+                    ) >= 0
+                      ? "positive"
+                      : "negative"
+                  }
+                >
 
-              {Math.abs(
-                stats.revenueGrowth
-              )}%
+                  {
+                    Number(
+                      stats.revenuePercent
+                    ) > 0
+                      ? "+"
+                      : ""
+                  }
 
-              {" "}
+                  {stats.revenuePercent}%
 
-              compared to last month
+                  {" "}
+                  compared to previous period
 
-            </p>
+                </div>
+              )
+            }
 
           </Card>
 
@@ -229,46 +355,15 @@ const Dashboard = () => {
 
         <Col xs={24} md={12} lg={6}>
 
-          <Card
-            bordered={false}
-            className="dashboard-card"
-          >
+          <Card className="dash-card">
 
             <Statistic
               title="Orders"
-              value={
-                stats.totalOrders
-              }
+              value={stats.totalOrders}
               prefix={
                 <ShoppingCartOutlined />
               }
             />
-
-            <p
-              className={`card-growth ${
-                stats.orderGrowth >= 0
-                  ? "growth-up"
-                  : "growth-down"
-              }`}
-            >
-
-              {stats.orderGrowth >= 0 ? (
-                <ArrowUpOutlined />
-              ) : (
-                <ArrowDownOutlined />
-              )}
-
-              {" "}
-
-              {Math.abs(
-                stats.orderGrowth
-              )}%
-
-              {" "}
-
-              compared to last month
-
-            </p>
 
           </Card>
 
@@ -278,46 +373,13 @@ const Dashboard = () => {
 
         <Col xs={24} md={12} lg={6}>
 
-          <Card
-            bordered={false}
-            className="dashboard-card"
-          >
+          <Card className="dash-card">
 
             <Statistic
               title="Users"
-              value={
-                stats.totalUsers
-              }
-              prefix={
-                <UserOutlined />
-              }
+              value={stats.totalUsers}
+              prefix={<UserOutlined />}
             />
-
-            <p
-              className={`card-growth ${
-                stats.userGrowth >= 0
-                  ? "growth-up"
-                  : "growth-down"
-              }`}
-            >
-
-              {stats.userGrowth >= 0 ? (
-                <ArrowUpOutlined />
-              ) : (
-                <ArrowDownOutlined />
-              )}
-
-              {" "}
-
-              {Math.abs(
-                stats.userGrowth
-              )}%
-
-              {" "}
-
-              compared to last month
-
-            </p>
 
           </Card>
 
@@ -327,127 +389,175 @@ const Dashboard = () => {
 
         <Col xs={24} md={12} lg={6}>
 
-          <Card
-            bordered={false}
-            className="dashboard-card"
-          >
+          <Card className="dash-card">
 
             <Statistic
               title="Foods"
-              value={
-                stats.totalFoods
-              }
+              value={stats.totalFoods}
               prefix={
                 <AppstoreOutlined />
               }
             />
 
-            <p
-              className={`card-growth ${
-                stats.foodGrowth >= 0
-                  ? "growth-up"
-                  : "growth-down"
-              }`}
-            >
-
-              {stats.foodGrowth >= 0 ? (
-                <ArrowUpOutlined />
-              ) : (
-                <ArrowDownOutlined />
-              )}
-
-              {" "}
-
-              {Math.abs(
-                stats.foodGrowth
-              )}%
-
-              {" "}
-
-              compared to last month
-
-            </p>
-
           </Card>
 
         </Col>
 
       </Row>
 
-      {/* CHART */}
+      {/* ================================================== */}
+      {/* CHART + TOP FOODS */}
+      {/* ================================================== */}
 
       <Row
         gutter={[20, 20]}
-        className="section-margin"
+        style={{
+          marginTop: 24,
+        }}
       >
 
-        <Col xs={24}>
+        {/* REVENUE CHART */}
+
+        <Col xs={24} lg={16}>
 
           <Card
-            title="Revenue Analytics"
-            bordered={false}
+            title="Revenue Overview"
             className="chart-card"
           >
 
-            <ResponsiveContainer
-              width="100%"
-              height={420}
-            >
+            {
+              stats.revenueChart &&
+              stats.revenueChart.length > 0
+                ? (
 
-              <AreaChart
-                data={revenueData}
-              >
-
-                <defs>
-
-                  <linearGradient
-                    id="colorRevenue"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
+                  <ResponsiveContainer
+                    width="100%"
+                    height={350}
                   >
 
-                    <stop
-                      offset="5%"
-                      stopColor="#1677ff"
-                      stopOpacity={0.8}
-                    />
+                    <BarChart
+                      data={
+                        stats.revenueChart
+                      }
+                    >
 
-                    <stop
-                      offset="95%"
-                      stopColor="#1677ff"
-                      stopOpacity={0}
-                    />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                      />
 
-                  </linearGradient>
+                      <XAxis
+                        dataKey="label"
+                      />
 
-                </defs>
+                      <YAxis
+                        allowDecimals={false}
+                      />
 
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                />
+                      <Tooltip />
 
-                <XAxis
-                  dataKey="month"
-                />
+                      <Bar
+                        dataKey="revenue"
+                        fill="#3b82f6"
+                        radius={[
+                          10,
+                          10,
+                          0,
+                          0,
+                        ]}
+                        barSize={38}
+                      />
 
-                <YAxis />
+                    </BarChart>
 
-                <Tooltip />
+                  </ResponsiveContainer>
+                )
 
-                <Area
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#1677ff"
-                  strokeWidth={4}
-                  fillOpacity={1}
-                  fill="url(#colorRevenue)"
-                />
+                : (
 
-              </AreaChart>
+                  <Empty
+                    description="No Revenue Data"
+                  />
+                )
+            }
 
-            </ResponsiveContainer>
+          </Card>
+
+        </Col>
+
+        {/* TOP SELLING FOODS */}
+
+        <Col xs={24} lg={8}>
+
+          <Card
+            title="Top Selling Foods"
+            className="chart-card"
+          >
+
+            {
+              stats.topFoods?.length > 0
+                ? (
+
+                  stats.topFoods.map(
+                    (
+                      food,
+                      index
+                    ) => {
+
+                      const max =
+                        stats.topFoods[0]
+                          ?.quantity || 1;
+
+                      const percent =
+                        (
+                          food.quantity / max
+                        ) * 100;
+
+                      return (
+
+                        <div
+                          key={index}
+                          className="food-item"
+                        >
+
+                          <div className="food-row">
+
+                            <span
+                              className="food-name"
+                            >
+                              {food.name}
+                            </span>
+
+                            <span
+                              className="food-qty"
+                            >
+                              {food.quantity}
+                            </span>
+
+                          </div>
+
+                          <Progress
+                            percent={Number(
+                              percent.toFixed(
+                                0
+                              )
+                            )}
+                            showInfo={false}
+                            strokeColor="#3b82f6"
+                          />
+
+                        </div>
+                      );
+                    }
+                  )
+                )
+
+                : (
+
+                  <Empty
+                    description="No Food Data"
+                  />
+                )
+            }
 
           </Card>
 
@@ -455,21 +565,28 @@ const Dashboard = () => {
 
       </Row>
 
+      {/* ================================================== */}
       {/* RECENT ORDERS */}
+      {/* ================================================== */}
 
-      <Row className="section-margin">
+      <Row
+        style={{
+          marginTop: 24,
+        }}
+      >
 
         <Col span={24}>
 
           <Card
             title="Recent Orders"
-            bordered={false}
-            className="table-card"
+            className="chart-card"
           >
 
             <Table
               columns={columns}
-              dataSource={tableData}
+              dataSource={
+                stats.recentOrders
+              }
               pagination={false}
             />
 
@@ -481,6 +598,7 @@ const Dashboard = () => {
 
     </div>
   );
+  
 };
 
 export default Dashboard;

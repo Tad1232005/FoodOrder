@@ -11,6 +11,7 @@ import RequireAdmin from './components/Auth/RequireAdmin.jsx'
 import { useAdminSession } from './context/AdminSessionContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { url } from './config/config.js'
+import "antd/dist/reset.css";
 
 function RequireNotStaff({ children }) {
   const { user } = useAdminSession()
