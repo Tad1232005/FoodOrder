@@ -13,6 +13,7 @@ import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import authRoutes from "./routes/authRoutes.js";
 import orderRouter from "./routes/orderRoute.js";
+import discountRouter from "./routes/discountRoute.js";
 import 'dotenv/config';
 import dns from "node:dns/promises";
 import startCronJobs from "./utils/cronJob.js";
@@ -66,7 +67,7 @@ app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/order", orderRouter);
-
+app.use("/api/discount", discountRouter);
 app.get("/", (req, res) => {
     res.send("API Working...");
 });
