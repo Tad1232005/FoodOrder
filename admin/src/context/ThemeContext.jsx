@@ -1,15 +1,15 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+// 1. Import ConfigProvider và theme từ antd
+import { ConfigProvider, theme as antdTheme } from 'antd'
 
 const ThemeContext = createContext(null)
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'light'
     try {
-      // 1. Kiểm tra localStorage trước
       const stored = localStorage.getItem('admin.theme')
       if (stored === 'dark' || stored === 'light') return stored
-      
-      // 2. Nếu chưa có, detect system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       return prefersDark ? 'dark' : 'light'
     } catch {
@@ -32,11 +32,24 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     const root = document.documentElement
     root.setAttribute('data-theme', theme)
+    root.setAttribute('data-bs-theme', theme)
+    document.body.className = theme
   }, [theme])
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
+      {/* 2. Bọc ConfigProvider ở đây để Antd tự động chuyển màu dropdown */}
+      <ConfigProvider
+        theme={{
+          algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+          token: {
+            // Bạn có thể tùy chỉnh thêm màu chủ đạo tại đây nếu muốn
+            // primaryColor: '#3b82f6', 
+          }
+        }}
+      >
+        {children}
+      </ConfigProvider>
     </ThemeContext.Provider>
   )
 }
