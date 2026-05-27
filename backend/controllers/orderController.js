@@ -1,5 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import discountModel from "../models/discountModel.js";
 import Stripe from "stripe";
 
 // Khởi tạo Stripe với Secret Key lấy từ file .env
@@ -14,16 +15,22 @@ const placeOrder = async (req, res) => {
         const newOrder = new orderModel({
             userId: req.body.userId,
             items: req.body.items,
-            amount: req.body.amount,
+            amount: req.body.amount, 
             address: req.body.address
         });
         await newOrder.save();
 
-        // 2. Xóa sạch giỏ hàng của user sau khi đã lên đơn 
-        // await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+        // 2. ĐÁNH DẤU TÀI KHOẢN ĐÃ SỬ DỤNG MÃ GIẢM GIÁ (STRIPE)
+        if (req.body.promoCode) {
+            await discountModel.findOneAndUpdate(
+                { code: req.body.promoCode },
+                { $addToSet: { usedBy: req.body.userId } } 
+            );
+        }
 
-        // 3. Chuẩn bị dữ liệu mảng sản phẩm (line_items) để gửi cho Stripe
-        const line_items = req.body.items.map((item) => ({
+        // 3. Chuẩn bị dữ liệu mảng sản phẩm (line_items)
+        // DÙNG 'let' ĐỂ CÓ THỂ CHỈNH SỬA Ở DƯỚI
+        let line_items = req.body.items.map((item) => ({
             price_data: {
                 currency: "usd",
                 product_data: {
@@ -34,17 +41,33 @@ const placeOrder = async (req, res) => {
             quantity: item.quantity
         }));
 
-        // 4. Cộng thêm phí giao hàng (Delivery Charges) vào bill Stripe
-        line_items.push({
-            price_data: {
-                currency: "usd",
-                product_data: {
-                    name: "Delivery Charges"
+        // 4. Xử lý logic tiền bạc với Stripe
+        if (req.body.discountAmount && req.body.discountAmount > 0) {
+            // NẾU CÓ GIẢM GIÁ: Xóa các món lẻ, gom thành 1 bill tổng duy nhất
+            // (Tránh lỗi Stripe cộng dồn cả món ăn + bill tổng)
+            line_items = [{
+                price_data: {
+                    currency: "usd",
+                    product_data: {
+                        name: "Food Order Total (Promo Code Applied)"
+                    },
+                    unit_amount: Math.round(req.body.amount * 100)
                 },
-                unit_amount: 2 * 100 // Phí ship 2$
-            },
-            quantity: 1
-        });
+                quantity: 1
+            }];
+        } else {
+            // NẾU KHÔNG GIẢM GIÁ: Giữ nguyên mảng món ăn ở trên, chỉ cộng thêm phí ship
+            line_items.push({
+                price_data: {
+                    currency: "usd",
+                    product_data: {
+                        name: "Delivery Charges"
+                    },
+                    unit_amount: 2 * 100 
+                },
+                quantity: 1
+            });
+        }
 
         // 5. Tạo khung thanh toán (Checkout Session) của Stripe
         const session = await stripe.checkout.sessions.create({
@@ -54,7 +77,6 @@ const placeOrder = async (req, res) => {
             cancel_url: `${frontend_url}/verify-order?success=false&orderId=${newOrder._id}`,
         });
 
-        // Trả link giao diện quẹt thẻ của Stripe về cho Frontend
         res.json({ success: true, session_url: session.url });
 
     } catch (error) {
@@ -62,6 +84,7 @@ const placeOrder = async (req, res) => {
         res.json({ success: false, message: "Error" });
     }
 }
+
 // API: Đặt hàng COD (không cần Stripe)
 const placeOrderCOD = async (req, res) => {
     try {
@@ -71,11 +94,19 @@ const placeOrderCOD = async (req, res) => {
             amount: req.body.amount,
             address: req.body.address,
             paymentMethod: "cod",
-            payment: false  // chưa trả tiền, chờ shipper thu
+            payment: false  
         });
         await newOrder.save();
 
-        // Xóa giỏ hàng như Stripe
+        // --- ĐÁNH DẤU TÀI KHOẢN ĐÃ SỬ DỤNG MÃ GIẢM GIÁ (COD) ---
+        if (req.body.promoCode) {
+            await discountModel.findOneAndUpdate(
+                { code: req.body.promoCode },
+                { $addToSet: { usedBy: req.body.userId } } 
+            );
+        }
+
+        // Xóa giỏ hàng
         await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
 
         res.json({ success: true, message: "Order placed" });
@@ -89,14 +120,13 @@ const placeOrderCOD = async (req, res) => {
 const verifyOrder = async (req, res) => {
     const { orderId, success } = req.body;
     try {
-        // Nếu URL trả về success=true -> Cập nhật DB thành đã thanh toán (true)
         if (success === "true") {
             await orderModel.findByIdAndUpdate(orderId, { payment: true });
-            // ← Chỉ xóa cart khi thanh toán thành công
             const order = await orderModel.findById(orderId);
+            await userModel.findByIdAndUpdate(order.userId, { cartData: {} });
             res.json({ success: true, message: "Paid" });
         } else {
-            // Hủy → xóa order rác, cart trong DB vẫn còn nguyên
+            // Khách hủy thanh toán -> Xóa đơn rác
             await orderModel.findByIdAndDelete(orderId);
             res.json({ success: false, message: "Not Paid" });
         }
@@ -106,14 +136,14 @@ const verifyOrder = async (req, res) => {
     }
 }
 
-//  người dùng đặt hàng của frontend
+// Lấy lịch sử đơn hàng của User
 const userOrders = async (req, res) => {
     try {
         const orders = await orderModel.find({
             userId: req.body.userId,
             $or: [
-                { payment: true },                    // đã thanh toán
-                { paymentMethod: "cod" }              // COD không cần payment true
+                { payment: true },                    
+                { paymentMethod: "cod" }              
             ]
         });
         res.json({ success: true, data: orders });
@@ -123,7 +153,7 @@ const userOrders = async (req, res) => {
     }
 }
 
-//Danh sách đơn hàng của admin
+// Danh sách đơn hàng cho Admin
 const listOrders = async (req, res) => {
     try {
         const orders = await orderModel.find({});
@@ -134,19 +164,16 @@ const listOrders = async (req, res) => {
     }
 }
 
-//api để cập nhật trạng thái đơn hàng
+// Cập nhật trạng thái đơn hàng (Admin)
 const updateStatus = async (req, res) => {
     try {
         const updateData = { status: req.body.status };
-
-        // Nếu admin đánh dấu "Delivered" → tự động set payment = true cho COD
         if (req.body.status === "Delivered") {
             const order = await orderModel.findById(req.body.orderId);
             if (order.paymentMethod === "cod") {
                 updateData.payment = true;
             }
         }
-
         await orderModel.findByIdAndUpdate(req.body.orderId, updateData);
         res.json({ success: true, message: "Status updated" });
     } catch (error) {
@@ -155,7 +182,7 @@ const updateStatus = async (req, res) => {
     }
 }
 
-// Mark as Paid cho COD
+// Đánh dấu COD đã thanh toán
 const markOrderAsPaid = async (req, res) => {
     try {
         const order = await orderModel.findById(req.body.orderId);
