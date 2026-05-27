@@ -1,551 +1,376 @@
-/* ====================================================== */
 /* ROOT */
-/* ====================================================== */
-
 .dashboard {
   padding: 24px;
   min-height: 100vh;
-  transition: all 0.25s ease;
 }
 
-/* ====================================================== */
 /* HEADER */
-/* ====================================================== */
-
 .dashboard-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   margin-bottom: 28px;
-
   gap: 16px;
   flex-wrap: wrap;
 }
-
 .dashboard-top h1 {
   margin: 0;
-
   font-size: 38px;
   font-weight: 800;
-
   letter-spacing: -1px;
 }
-
 .dashboard-top p {
   margin-top: 6px;
-
   font-size: 15px;
 }
 
-/* ====================================================== */
 /* FILTER */
-/* ====================================================== */
-
 .filters {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 .filters .ant-select,
 .filters .ant-picker {
   min-width: 160px;
 }
-
 .ant-select-selector,
 .ant-picker {
   height: 42px !important;
-
   border-radius: 12px !important;
-
   display: flex;
   align-items: center;
 }
-
 .ant-picker-input input {
   font-weight: 500;
 }
 
-/* ====================================================== */
 /* CARD */
-/* ====================================================== */
-
 .dash-card,
 .chart-card,
 .ant-card {
   border-radius: 18px !important;
-
   overflow: hidden;
-
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease;
 }
-
 .dash-card:hover {
   transform: translateY(-3px);
 }
 
-/* ====================================================== */
 /* CARD TITLE */
-/* ====================================================== */
-
 .ant-card-head-title {
   font-size: 20px !important;
   font-weight: 700 !important;
 }
-
 .ant-card-head {
   min-height: 58px !important;
 }
 
-/* ====================================================== */
 /* STATISTIC */
-/* ====================================================== */
-
 .ant-statistic {
   padding: 6px 0;
 }
-
 .ant-statistic-content {
   font-weight: 700 !important;
 }
-
 .ant-statistic-content-prefix {
   color: #3b82f6 !important;
   margin-right: 10px;
 }
 
-/* ====================================================== */
 /* FOOD */
-/* ====================================================== */
-
 .food-item {
   margin-bottom: 18px;
 }
-
 .food-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   gap: 14px;
-
   margin-bottom: 8px;
-
   font-size: 14px;
   font-weight: 600;
 }
-
 .food-row span:first-child {
   flex: 1;
-
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .food-row span:last-child {
   min-width: 35px;
   text-align: right;
 }
 
-/* ====================================================== */
 /* PROGRESS */
-/* ====================================================== */
-
 .ant-progress-bg {
   border-radius: 999px !important;
 }
 
-/* ====================================================== */
 /* TABLE */
-/* ====================================================== */
-
 .ant-table-wrapper {
   overflow-x: auto;
 }
-
 .ant-table-container {
   border-radius: 14px !important;
   overflow: hidden;
 }
-
 .ant-table {
   border-radius: 14px !important;
 }
-
 .ant-table-thead > tr > th {
   font-weight: 700 !important;
 }
-
 .ant-table-cell {
   white-space: nowrap;
 }
 
-/* ====================================================== */
 /* STATUS */
-/* ====================================================== */
-
 .positive {
   color: #22c55e;
   font-weight: 700;
   margin-top: 10px;
 }
-
 .negative {
   color: #ef4444;
   font-weight: 700;
   margin-top: 10px;
 }
 
-/* ====================================================== */
 /* CHART */
-/* ====================================================== */
-
 .recharts-tooltip-wrapper {
   outline: none !important;
 }
 
-/* ====================================================== */
 /* LIGHT MODE */
-/* ====================================================== */
-
 body.light,
 body.light #root {
   background: #ffffff !important;
 }
-
 body.light .dashboard {
   background: #ffffff !important;
 }
-
 /* text */
-
 body.light .dashboard-top h1 {
   color: #000000;
 }
-
 body.light .dashboard-top p {
   color: #6b7280;
 }
-
 /* card */
-
 body.light .dash-card,
 body.light .chart-card,
 body.light .ant-card {
   background: #ffffff !important;
-
-  border:
-    1px solid #e5e7eb !important;
-
-  box-shadow:
-    0 4px 15px rgba(0,0,0,0.05) !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
 }
-
 body.light .ant-card-head {
-  border-bottom:
-    1px solid #f1f5f9 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
 }
-
 body.light .ant-card-head-title,
 body.light .food-row,
 body.light .ant-statistic-content,
 body.light .ant-statistic-content-value {
   color: #000000 !important;
 }
-
 body.light .ant-statistic-title {
   color: #6b7280 !important;
 }
-
 /* table */
-
 body.light .ant-table {
   background: #ffffff !important;
 }
-
 body.light .ant-table-thead > tr > th {
   background: #ffffff !important;
-
   color: #000000 !important;
-
-  border-bottom:
-    1px solid #e5e7eb !important;
+  border-bottom: 1px solid #e5e7eb !important;
 }
-
 body.light .ant-table-tbody > tr > td {
   background: #ffffff !important;
-
   color: #111827 !important;
-
-  border-bottom:
-    1px solid #f3f4f6 !important;
+  border-bottom: 1px solid #f3f4f6 !important;
 }
-
 body.light .ant-table-tbody > tr:hover > td {
   background: #fafafa !important;
 }
-
 /* filter */
-
 body.light .ant-select-selector,
 body.light .ant-picker {
   background: #ffffff !important;
-
-  border:
-    1px solid #d1d5db !important;
-
+  border: 1px solid #d1d5db !important;
   color: #000000 !important;
 }
-
 body.light .ant-select-selection-item,
 body.light .ant-picker input {
   color: #000000 !important;
 }
-
 /* calendar */
-
 body.light .ant-picker-dropdown .ant-picker-panel-container {
   background: #ffffff !important;
 }
-
 body.light .ant-picker-content th,
 body.light .ant-picker-cell {
   color: #111827 !important;
 }
-
 /* chart */
-
 body.light .recharts-text {
   fill: #374151 !important;
 }
-
 body.light .recharts-cartesian-grid line {
   stroke: #e5e7eb !important;
 }
 
-/* ====================================================== */
 /* DARK MODE */
-/* ====================================================== */
-
 body.dark,
 body.dark #root {
   background: #111315 !important;
 }
-
 body.dark .dashboard {
   background: #111315 !important;
 }
-
 /* text */
-
 body.dark .dashboard-top h1 {
   color: #ffffff;
 }
-
 body.dark .dashboard-top p {
   color: #9ca3af;
 }
-
 /* card */
-
 body.dark .dash-card,
 body.dark .chart-card,
 body.dark .ant-card {
   background: #181a1f !important;
-
-  border:
-    1px solid #24262d !important;
-
-  box-shadow:
-    0 4px 18px rgba(0,0,0,0.28) !important;
+  border: 1px solid #24262d !important;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.28) !important;
 }
-
 body.dark .ant-card-head {
-  border-bottom:
-    1px solid #24262d !important;
+  border-bottom: 1px solid #24262d !important;
 }
-
 body.dark .ant-card-head-title,
 body.dark .food-row,
 body.dark .ant-statistic-content,
 body.dark .ant-statistic-content-value {
   color: #ffffff !important;
 }
-
 body.dark .ant-statistic-title {
   color: #9ca3af !important;
 }
-
 /* table */
-
 body.dark .ant-table {
   background: #181a1f !important;
 }
-
 body.dark .ant-table-thead > tr > th {
   background: #1d2026 !important;
-
   color: #ffffff !important;
-
-  border-bottom:
-    1px solid #2a2d36 !important;
+  border-bottom: 1px solid #2a2d36 !important;
 }
-
 body.dark .ant-table-tbody > tr > td {
   background: #181a1f !important;
-
   color: #e5e7eb !important;
-
-  border-bottom:
-    1px solid #24262d !important;
+  border-bottom: 1px solid #24262d !important;
 }
-
 body.dark .ant-table-tbody > tr:hover > td {
   background: #20232b !important;
 }
-
 /* filter */
-
 body.dark .ant-select-selector,
 body.dark .ant-picker {
   background: #1d2026 !important;
-
-  border:
-    1px solid #2a2d36 !important;
-
+  border: 1px solid #2a2d36 !important;
   color: #ffffff !important;
 }
-
 body.dark .ant-select-selection-item,
 body.dark .ant-picker input {
   color: #ffffff !important;
 }
-
 /* calendar */
-
 body.dark .ant-picker-dropdown .ant-picker-panel-container {
   background: #181a1f !important;
 }
-
 body.dark .ant-picker-content th,
 body.dark .ant-picker-cell {
   color: #f3f4f6 !important;
 }
-
 /* chart */
-
 body.dark .recharts-text {
   fill: #d1d5db !important;
 }
-
 body.dark .recharts-cartesian-grid line {
   stroke: #2a2d36 !important;
 }
 
-/* ====================================================== */
 /* RESPONSIVE */
-/* ====================================================== */
-
 @media (max-width: 768px) {
-
   .dashboard {
     padding: 16px;
   }
-
   .dashboard-top {
     flex-direction: column;
     align-items: flex-start;
   }
-
   .dashboard-top h1 {
     font-size: 30px;
   }
-
   .filters {
     width: 100%;
     flex-direction: column;
   }
-
   .filters .ant-select,
   .filters .ant-picker {
     width: 100% !important;
   }
 }
-/* ====================================================== */
-/* FILTER GROUP */
-/* ====================================================== */
 
+/* FILTER GROUP */
 .filter-group {
   display: flex;
   align-items: center;
   gap: 10px;
-
   padding: 6px 8px;
-
   border-radius: 14px;
 }
-
 /* dropdown */
-
 .filter-select {
   width: 120px;
 }
-
 /* date picker */
-
 .filter-date {
   min-width: 160px;
 }
 
-/* ====================================================== */
-/* LIGHT MODE */
-/* ====================================================== */
-
+/* LIGHT MODE (FILTER GROUP) */
 body.light .filter-group {
   background: #ffffff;
-
-  border:
-    1px solid #e5e7eb;
-
-  box-shadow:
-    0 2px 10px rgba(0,0,0,0.04);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
 }
 
-/* ====================================================== */
-/* DARK MODE */
-/* ====================================================== */
-
+/* DARK MODE (FILTER GROUP) */
 body.dark .filter-group {
   background: #181a1f;
-
-  border:
-    1px solid #24262d;
-
-  box-shadow:
-    0 4px 14px rgba(0,0,0,0.25);
+  border: 1px solid #24262d;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
 }
-
 /* dark dropdown */
-
 body.dark .ant-select-dropdown {
   background: #181a1f !important;
-
-  border:
-    1px solid #2a2d36 !important;
+  border: 1px solid #2a2d36 !important;
 }
-
 body.dark .ant-select-item {
   color: #f3f4f6 !important;
 }
-
 body.dark .ant-select-item-option-active {
   background: #24262d !important;
 }
-
 body.dark .ant-select-item-option-selected {
   background: #2563eb !important;
-
   color: #ffffff !important;
+}
+
+/* Ép tất cả thành phần chuyển màu ngay lập tức không delay */
+body.dark *, 
+body.light * {
+  transition-property: transform, opacity !important;
+  transition-duration: 0.2s !important;
 }

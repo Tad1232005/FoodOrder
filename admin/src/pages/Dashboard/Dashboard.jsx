@@ -1,281 +1,126 @@
-// ======================================================
-// FILE:
-// admin/src/pages/Dashboard/Dashboard.jsx
-// ======================================================
-
-import {
-  useEffect,
-  useState,
-} from "react";
-
+import { useEffect, useState } from "react";
 import axios from "axios";
-
 import dayjs from "dayjs";
-
-import {
-  Card,
-  Col,
-  Row,
-  Statistic,
-  Table,
-  DatePicker,
-  Progress,
-  Empty,
-  Tag,
-  Select,
-} from "antd";
-
-import {
-  DollarOutlined,
-  ShoppingCartOutlined,
-  UserOutlined,
-  AppstoreOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
+import { Card, Col, Row, Statistic, Table, DatePicker, Progress, Empty, Tag, Select } from "antd";
+import { 
+  DollarOutlined, 
+  ShoppingCartOutlined, 
+  UserOutlined, 
+  AppstoreOutlined, 
+  CheckCircleOutlined, 
+  CloseCircleOutlined 
 } from "@ant-design/icons";
-
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
-
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import "./Dashboard.css";
 
 const { Option } = Select;
 
 const Dashboard = () => {
+  // TRẠNG THÁI THỐNG KÊ DASHBOARD
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalFoods: 0,
+    totalOrders: 0,
+    filteredRevenue: 0,
+    recentOrders: [],
+    revenueChart: [],
+    topFoods: [],
+    revenuePercent: null,
+  });
 
-  // ======================================================
-  // DASHBOARD STATS STATE
-  // ======================================================
+  // TRẠNG THÁI BỘ LỌC
+  const [filterType, setFilterType] = useState("month");
+  const [selectedDate, setSelectedDate] = useState(dayjs());
 
-  const [stats, setStats] =
-    useState({
-
-      totalUsers: 0,
-
-      totalFoods: 0,
-
-      totalOrders: 0,
-
-      filteredRevenue: 0,
-
-      recentOrders: [],
-
-      revenueChart: [],
-
-      topFoods: [],
-
-      revenuePercent: null,
-    });
-
-  // ======================================================
-  // FILTER STATE
-  // ======================================================
-
-  const [filterType, setFilterType] =
-    useState("month");
-
-  const [selectedDate, setSelectedDate] =
-    useState(dayjs());
-
-  // ======================================================
-  // FETCH DASHBOARD WHEN FILTER CHANGES
-  // ======================================================
-
+  // TẢI DỮ LIỆU DASHBOARD KHI BỘ LỌC THAY ĐỔI
   useEffect(() => {
-
     fetchDashboard();
-
   }, [filterType, selectedDate]);
 
-  // ======================================================
-  // FETCH DASHBOARD DATA
-  // ======================================================
+  // TẢI DỮ LIỆU DASHBOARD
+  const fetchDashboard = async () => {
+    try {
+      const res = await axios.get("http://localhost:4000/api/admin/dashboard", {
+        params: {
+          filterType,
+          date: selectedDate.format("YYYY-MM-DD"),
+        },
+      });
 
-  const fetchDashboard =
-    async () => {
-
-      try {
-
-        const res =
-          await axios.get(
-            "http://localhost:4000/api/admin/dashboard",
-            {
-              params: {
-
-                filterType,
-
-                date:
-                  selectedDate.format(
-                    "YYYY-MM-DD"
-                  ),
-              },
-            }
-          );
-
-        // ==================================================
-        // IF API SUCCESS
-        // ==================================================
-
-        if (res.data.success) {
-
-          setStats(res.data);
-        }
-
-      } catch (error) {
-
-        console.log(error);
+      // NẾU GỌI API THÀNH CÔNG
+      if (res.data.success) {
+        setStats(res.data);
       }
-    };
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  // ======================================================
-  // TABLE COLUMNS
-  // ======================================================
-
+  // CÁC CỘT CỦA BẢNG
   const columns = [
-
-    // ====================================================
-    // CUSTOMER
-    // ====================================================
-
+    // KHÁCH HÀNG
     {
       title: "Customer",
       dataIndex: "customer",
     },
-
-    // ====================================================
-    // ORDER DATE
-    // ====================================================
-
+    // NGÀY ĐẶT HÀNG
     {
       title: "Date",
       dataIndex: "date",
-
       align: "right",
     },
-
-    // ====================================================
-    // ORDER STATUS
-    // ====================================================
-
+    // TRẠNG THÁI ĐƠN HÀNG
     {
       title: "Status",
       dataIndex: "status",
-
-      render: (status) => (
-
-        <Tag color="blue">
-          {status}
-        </Tag>
-      ),
+      render: (status) => <Tag color="blue">{status}</Tag>,
     },
-
-    // ====================================================
-    // PAYMENT STATUS
-    // ====================================================
-
+    // TRẠNG THÁI THANH TOÁN
     {
       title: "Payment",
       dataIndex: "payment",
-
       align: "center",
-
       render: (payment) => (
-
         payment ? (
-
-          <CheckCircleOutlined
-            style={{
-              color: "#22c55e",
-              fontSize: 20,
-            }}
-          />
-
+          <CheckCircleOutlined style={{ color: "#22c55e", fontSize: 20 }} />
         ) : (
-
-          <CloseCircleOutlined
-            style={{
-              color: "#ef4444",
-              fontSize: 20,
-            }}
-          />
+          <CloseCircleOutlined style={{ color: "#ef4444", fontSize: 20 }} />
         )
       ),
     },
-
-    // ====================================================
-    // TOTAL AMOUNT
-    // ====================================================
-
+    // TỔNG TIỀN
     {
       title: "Amount",
       dataIndex: "amount",
-
       align: "right",
     },
   ];
 
   return (
-
     <div className="dashboard">
-
-      {/* ================================================== */}
-      {/* DASHBOARD HEADER */}
-      {/* ================================================== */}
-
+      {/* PHẦN ĐẦU DASHBOARD */}
       <div className="dashboard-top">
-
-        {/* TITLE */}
-
+        {/* TIÊU ĐỀ */}
         <div>
-
-          <h1>
-            Analytics Dashboard
-          </h1>
-
-          <p>
-            Revenue statistics overview
-          </p>
-
+          <h1>Analytics Dashboard</h1>
+          <p>Revenue statistics overview</p>
         </div>
 
-        {/* ================================================= */}
-        {/* TIME FILTER */}
-        {/* ================================================= */}
-
+        {/* BỘ LỌC THỜI GIAN */}
         <div className="filter-bar">
-
-          {/* FILTER TYPE DROPDOWN */}
-
+          {/* DROPDOWN CHỌN LOẠI BỘ LỌC */}
           <Select
             value={filterType}
             onChange={setFilterType}
             className="filter-select"
             dropdownClassName="dashboard-dropdown"
           >
-
-            <Option value="day">
-              Daily
-            </Option>
-
-            <Option value="month">
-              Monthly
-            </Option>
-
-            <Option value="year">
-              Yearly
-            </Option>
-
+            <Option value="day">Daily</Option>
+            <Option value="month">Monthly</Option>
+            <Option value="year">Yearly</Option>
           </Select>
 
-          {/* DATE PICKER */}
-
+          {/* BỘ CHỌN NGÀY */}
           <DatePicker
             picker={filterType}
             value={selectedDate}
@@ -283,322 +128,134 @@ const Dashboard = () => {
             allowClear={false}
             className="filter-date"
           />
-
         </div>
-
       </div>
 
-      {/* ================================================== */}
-      {/* STATISTIC CARDS */}
-      {/* ================================================== */}
-
+      {/* CÁC THẺ THỐNG KÊ */}
       <Row gutter={[20, 20]}>
-
-        {/* REVENUE */}
-
+        {/* DOANH THU */}
         <Col xs={24} md={12} lg={6}>
-
           <Card className="dash-card">
-
             <Statistic
               title="Revenue"
-              value={
-                Number(
-                  stats.filteredRevenue || 0
-                )
-              }
+              value={Number(stats.filteredRevenue || 0)}
               precision={2}
               prefix={<DollarOutlined />}
             />
-
-            {/* REVENUE PERCENT */}
-
-            {
-              stats.revenuePercent !==
-                null &&
-              Number(
-                stats.revenuePercent
-              ) !== 0 && (
-
-                <div
-                  className={
-                    Number(
-                      stats.revenuePercent
-                    ) >= 0
-                      ? "positive"
-                      : "negative"
-                  }
-                >
-
-                  {
-                    Number(
-                      stats.revenuePercent
-                    ) > 0
-                      ? "+"
-                      : ""
-                  }
-
-                  {stats.revenuePercent}%
-
-                  {" "}
-                  compared to previous period
-
-                </div>
-              )
-            }
-
+            {/* PHẦN TRĂM DOANH THU */}
+            {stats.revenuePercent !== null && Number(stats.revenuePercent) !== 0 && (
+              <div className={Number(stats.revenuePercent) >= 0 ? "positive" : "negative"}>
+                {Number(stats.revenuePercent) > 0 ? "+" : ""}
+                {stats.revenuePercent}% so với kỳ trước
+              </div>
+            )}
           </Card>
-
         </Col>
 
-        {/* ORDERS */}
-
+        {/* ĐƠN HÀNG */}
         <Col xs={24} md={12} lg={6}>
-
           <Card className="dash-card">
-
             <Statistic
               title="Orders"
               value={stats.totalOrders}
-              prefix={
-                <ShoppingCartOutlined />
-              }
+              prefix={<ShoppingCartOutlined />}
             />
-
           </Card>
-
         </Col>
 
-        {/* USERS */}
-
+        {/* NGƯỜI DÙNG */}
         <Col xs={24} md={12} lg={6}>
-
           <Card className="dash-card">
-
             <Statistic
               title="Users"
               value={stats.totalUsers}
               prefix={<UserOutlined />}
             />
-
           </Card>
-
         </Col>
 
-        {/* FOODS */}
-
+        {/* MÓN ĂN */}
         <Col xs={24} md={12} lg={6}>
-
           <Card className="dash-card">
-
             <Statistic
               title="Foods"
               value={stats.totalFoods}
-              prefix={
-                <AppstoreOutlined />
-              }
+              prefix={<AppstoreOutlined />}
             />
-
           </Card>
-
         </Col>
-
       </Row>
 
-      {/* ================================================== */}
-      {/* CHART + TOP FOODS */}
-      {/* ================================================== */}
-
-      <Row
-        gutter={[20, 20]}
-        style={{
-          marginTop: 24,
-        }}
-      >
-
-        {/* REVENUE CHART */}
-
+      {/* BIỂU ĐỒ + MÓN BÁN CHẠY NHẤT */}
+      <Row gutter={[20, 20]} style={{ marginTop: 24 }}>
+        {/* BIỂU ĐỒ DOANH THU */}
         <Col xs={24} lg={16}>
-
-          <Card
-            title="Revenue Overview"
-            className="chart-card"
-          >
-
-            {
-              stats.revenueChart &&
-              stats.revenueChart.length > 0
-                ? (
-
-                  <ResponsiveContainer
-                    width="100%"
-                    height={350}
-                  >
-
-                    <BarChart
-                      data={
-                        stats.revenueChart
-                      }
-                    >
-
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                      />
-
-                      <XAxis
-                        dataKey="label"
-                      />
-
-                      <YAxis
-                        allowDecimals={false}
-                      />
-
-                      <Tooltip />
-
-                      <Bar
-                        dataKey="revenue"
-                        fill="#3b82f6"
-                        radius={[
-                          10,
-                          10,
-                          0,
-                          0,
-                        ]}
-                        barSize={38}
-                      />
-
-                    </BarChart>
-
-                  </ResponsiveContainer>
-                )
-
-                : (
-
-                  <Empty
-                    description="No Revenue Data"
+          <Card title="Revenue Overview" className="chart-card">
+            {stats.revenueChart && stats.revenueChart.length > 0 ? (
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={stats.revenueChart}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="label" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar
+                    dataKey="revenue"
+                    fill="#3b82f6"
+                    radius={[10, 10, 0, 0]}
+                    barSize={38}
                   />
-                )
-            }
-
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <Empty description="Không có dữ liệu doanh thu" />
+            )}
           </Card>
-
         </Col>
 
-        {/* TOP SELLING FOODS */}
-
+        {/* CÁC MÓN BÁN CHẠY NHẤT */}
         <Col xs={24} lg={8}>
+          <Card title="Top Selling Foods" className="chart-card">
+            {stats.topFoods?.length > 0 ? (
+              stats.topFoods.map((food, index) => {
+                const max = stats.topFoods[0]?.quantity || 1;
+                const percent = (food.quantity / max) * 100;
 
-          <Card
-            title="Top Selling Foods"
-            className="chart-card"
-          >
-
-            {
-              stats.topFoods?.length > 0
-                ? (
-
-                  stats.topFoods.map(
-                    (
-                      food,
-                      index
-                    ) => {
-
-                      const max =
-                        stats.topFoods[0]
-                          ?.quantity || 1;
-
-                      const percent =
-                        (
-                          food.quantity / max
-                        ) * 100;
-
-                      return (
-
-                        <div
-                          key={index}
-                          className="food-item"
-                        >
-
-                          <div className="food-row">
-
-                            <span
-                              className="food-name"
-                            >
-                              {food.name}
-                            </span>
-
-                            <span
-                              className="food-qty"
-                            >
-                              {food.quantity}
-                            </span>
-
-                          </div>
-
-                          <Progress
-                            percent={Number(
-                              percent.toFixed(
-                                0
-                              )
-                            )}
-                            showInfo={false}
-                            strokeColor="#3b82f6"
-                          />
-
-                        </div>
-                      );
-                    }
-                  )
-                )
-
-                : (
-
-                  <Empty
-                    description="No Food Data"
-                  />
-                )
-            }
-
+                return (
+                  <div key={index} className="food-item">
+                    <div className="food-row">
+                      <span className="food-name">{food.name}</span>
+                      <span className="food-qty">{food.quantity}</span>
+                    </div>
+                    <Progress
+                      percent={Number(percent.toFixed(0))}
+                      showInfo={false}
+                      strokeColor="#3b82f6"
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <Empty description="Không có dữ liệu món ăn" />
+            )}
           </Card>
-
         </Col>
-
       </Row>
 
-      {/* ================================================== */}
-      {/* RECENT ORDERS */}
-      {/* ================================================== */}
-
-      <Row
-        style={{
-          marginTop: 24,
-        }}
-      >
-
+      {/* CÁC ĐƠN HÀNG GẦN ĐÂY */}
+      <Row style={{ marginTop: 24 }}>
         <Col span={24}>
-
-          <Card
-            title="Recent Orders"
-            className="chart-card"
-          >
-
+          <Card title="Recent Orders" className="chart-card">
             <Table
               columns={columns}
-              dataSource={
-                stats.recentOrders
-              }
+              dataSource={stats.recentOrders}
               pagination={false}
+              rowKey={(record) => record._id || record.id || Math.random()} 
             />
-
           </Card>
-
         </Col>
-
       </Row>
-
     </div>
   );
-  
 };
 
 export default Dashboard;
