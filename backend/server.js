@@ -56,7 +56,10 @@ const customMongoSanitize = (req, res, next) => {
 
 // middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: "https://food-order-theta-tan.vercel.app", // Link frontend của bạn (không có dấu / ở cuối)
+    credentials: true
+}));
 
 // Kích hoạt màng lọc
 app.use(customMongoSanitize);
