@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'logo-192.jpg', 'logo-512.png', 'logo-maskable.png', 'offline.html'],
+      includeAssets: ['favicon.ico', 'logo-192.jpg', 'logo-512.png', 'logo-maskable.png'],
       manifest: {
         id: '/',
         name: 'FoodOrder',
@@ -38,36 +38,32 @@ export default defineConfig({
         ]
       },
       workbox: {
-        // Cache các trang chính khi offline
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
 
-        // ✅ thêm: offline fallback khi không có mạng
-        navigateFallback: '/offline.html',
-        navigateFallbackDenylist: [/^\/api/], // API thì không fallback về offline
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/], 
 
         runtimeCaching: [
           {
-            // Cache API food list để xem menu offline
             urlPattern: /\/api\/food\/list/,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'food-api-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 // 1 ngày
+                maxAgeSeconds: 60 * 60 * 24 
               }
             }
           },
           {
-            // ✅ thêm: cache ảnh món ăn — CacheFirst vì ảnh ít thay đổi
             urlPattern: /\/images\/.+\.(png|jpg|jpeg|webp|svg)$/,
             handler: 'CacheFirst',
             options: {
               cacheName: 'food-images-cache',
               expiration: {
                 maxEntries: 60,
-                maxAgeSeconds: 60 * 60 * 24 * 7  // 7 ngày
+                maxAgeSeconds: 60 * 60 * 24 * 7  
               }
             }
           }
