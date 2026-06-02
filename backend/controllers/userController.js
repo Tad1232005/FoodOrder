@@ -101,6 +101,7 @@ const registerUser = async (req, res) => {
                 message: "Registration successful! Please check your email for the verification code."
             });
         } catch (mailError) {
+            console.error("MAIL OTP ERROR:", mailError);
             // Nếu mail kẹt/lỗi, xóa user đi để họ có thể đăng ký lại
             await userModel.findByIdAndDelete(newUser._id);
             return res.json({ success: false, message: "Lỗi gửi mail OTP. Đăng ký không thành công!" });
@@ -245,7 +246,7 @@ const adminCreateUser = async (req, res) => {
             });
 
         } catch (mailError) {
-            console.log("❌ LỖI GỬI MAIL CỤ THỂ LÀ:", mailError.message);
+            console.error("❌ LỖI GỬI MAIL INVITE:", mailError);
 
             // 💡 QUAN TRỌNG: Xóa luôn user vừa tạo để DB không bị kẹt rác, Admin có thể tạo lại
             await userModel.findByIdAndDelete(newUser._id);

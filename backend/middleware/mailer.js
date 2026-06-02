@@ -5,7 +5,10 @@ import nodemailer from "nodemailer";
 
 // Tạo transporter dùng Gmail
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    // Dùng cấu hình SMTP chuẩn để tránh khác biệt giữa môi trường/local/Render.
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // bắt buộc true với port 465
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -14,6 +17,10 @@ const transporter = nodemailer.createTransport({
     connectionTimeout: 10_000,
     greetingTimeout: 10_000,
     socketTimeout: 15_000,
+    tls: {
+        rejectUnauthorized: false,
+        minVersion: "TLSv1.2",
+    },
 });
 
 // Gửi mã xác thực 6 số
