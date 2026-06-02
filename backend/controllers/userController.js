@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import validator from "validator";
 import { sendVerifyEmail } from "../middleware/mailer.js";
 import { randomBytes } from "crypto";
-import {sendInviteEmail} from "../utils/sendMail.js";
+import { sendInviteEmail } from "../utils/sendMail.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -25,11 +25,11 @@ const generateCode = () => String(Math.floor(100000 + Math.random() * 900000));
 // ── Login ──────────────────────────────────────────────────────────────────
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
-      // Chặn NoSQL injection
+    // Chặn NoSQL injection
     if (typeof email !== "string" || typeof password !== "string") {
         return res.json({ success: false, message: "Invalid input" });
     }
-    
+
     try {
         const user = await userModel.findOne({ email });
         if (!user) return res.json({ success: false, message: "This account does not exist!" });
@@ -75,7 +75,6 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Tạo mã xác thực 6 số, hết hạn sau 10 phút
         const code = generateCode();
         const expiry = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -89,22 +88,27 @@ const registerUser = async (req, res) => {
             verifyCodeExpiry: expiry,
         });
 
+        // 1. Lưu DB
         await newUser.save();
 
-        // Gửi email chứa mã 6 số
-        await sendVerifyEmail(email, code);
-
-        // Trả về email để frontend redirect sang trang verify
-        res.json({
-            success: true,
-            needVerify: true,
-            email,
-            message: "Registration successful! Please check your email for the verification code."
-        });
+        // 2. Cố gắng gửi mail OTP
+        try {
+            await sendVerifyEmail(email, code);
+            return res.json({
+                success: true,
+                needVerify: true,
+                email,
+                message: "Registration successful! Please check your email for the verification code."
+            });
+        } catch (mailError) {
+            // Nếu mail kẹt/lỗi, xóa user đi để họ có thể đăng ký lại
+            await userModel.findByIdAndDelete(newUser._id);
+            return res.json({ success: false, message: "Lỗi gửi mail OTP. Đăng ký không thành công!" });
+        }
 
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Sign-up error" });
+        return res.json({ success: false, message: "Sign-up error" });
     }
 };
 
@@ -226,18 +230,31 @@ const adminCreateUser = async (req, res) => {
         const link = `${process.env.FRONTEND_URL}/set-password?token=${inviteToken}`;
 
         // gửi mail
-        await sendInviteEmail({
-            to: email,
-            name,
-            role,
-            link
-        });
+        try {
+            await sendInviteEmail({
+                to: email,
+                name,
+                role,
+                link
+            });
 
-        return res.json({
-            success: true,
-            message: "User created & invite sent"
-        });
+            // Nếu mail gửi thành công, trả về cho Frontend
+            return res.json({
+                success: true,
+                message: "User created & invite sent"
+            });
 
+        } catch (mailError) {
+            console.log("❌ LỖI GỬI MAIL CỤ THỂ LÀ:", mailError.message);
+
+            // 💡 QUAN TRỌNG: Xóa luôn user vừa tạo để DB không bị kẹt rác, Admin có thể tạo lại
+            await userModel.findByIdAndDelete(newUser._id);
+
+            return res.json({
+                success: false,
+                message: "Failed to send email. Check SMTP setup!"
+            });
+        }
     } catch (err) {
         console.log(err);
         return res.json({ success: false, message: "Server error" });

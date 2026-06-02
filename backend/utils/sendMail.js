@@ -1,13 +1,17 @@
 import nodemailer from "nodemailer";
 
-
-
 export const sendInviteEmail = async ({ to, name, role, link }) => {
     const transporter = nodemailer.createTransport({
-        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 465,         // Cổng bảo mật SMTP của Google
+        secure: true,      // Bắt buộc là true khi dùng port 465
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
+        },
+        // Thêm dòng này để tránh bị một số môi trường (hoặc antivirus ở local) chặn chứng chỉ
+        tls: {
+            rejectUnauthorized: false
         }
     });
 
