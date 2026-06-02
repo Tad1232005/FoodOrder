@@ -8,14 +8,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // API 1: Đặt hàng từ Frontend và tạo link thanh toán Stripe
 const placeOrder = async (req, res) => {
-    const frontend_url = "http://localhost:5173";
-
+    const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173";
     try {
         // 1. Tạo đơn hàng mới lưu vào MongoDB (mặc định payment: false)
         const newOrder = new orderModel({
             userId: req.body.userId,
             items: req.body.items,
-            amount: req.body.amount, 
+            amount: req.body.amount,
             address: req.body.address
         });
         await newOrder.save();
@@ -24,7 +23,7 @@ const placeOrder = async (req, res) => {
         if (req.body.promoCode) {
             await discountModel.findOneAndUpdate(
                 { code: req.body.promoCode },
-                { $addToSet: { usedBy: req.body.userId } } 
+                { $addToSet: { usedBy: req.body.userId } }
             );
         }
 
@@ -63,7 +62,7 @@ const placeOrder = async (req, res) => {
                     product_data: {
                         name: "Delivery Charges"
                     },
-                    unit_amount: 2 * 100 
+                    unit_amount: 2 * 100
                 },
                 quantity: 1
             });
@@ -94,7 +93,7 @@ const placeOrderCOD = async (req, res) => {
             amount: req.body.amount,
             address: req.body.address,
             paymentMethod: "cod",
-            payment: false  
+            payment: false
         });
         await newOrder.save();
 
@@ -102,7 +101,7 @@ const placeOrderCOD = async (req, res) => {
         if (req.body.promoCode) {
             await discountModel.findOneAndUpdate(
                 { code: req.body.promoCode },
-                { $addToSet: { usedBy: req.body.userId } } 
+                { $addToSet: { usedBy: req.body.userId } }
             );
         }
 
@@ -142,8 +141,8 @@ const userOrders = async (req, res) => {
         const orders = await orderModel.find({
             userId: req.body.userId,
             $or: [
-                { payment: true },                    
-                { paymentMethod: "cod" }              
+                { payment: true },
+                { paymentMethod: "cod" }
             ]
         });
         res.json({ success: true, data: orders });
