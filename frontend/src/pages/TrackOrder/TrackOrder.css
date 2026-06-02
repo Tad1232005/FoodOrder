@@ -1,0 +1,244 @@
+.track-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: 100vh;
+}
+
+.track-header {
+    margin-bottom: 40px;
+}
+
+.track-back {
+    color: tomato;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.track-back:hover { opacity: 0.8; }
+
+.track-header h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 12px 0 4px;
+    color: #262626;
+}
+
+.track-id {
+    font-size: 13px;
+    color: #888;
+}
+
+.track-id span { color: tomato; font-weight: 600; }
+
+/* ── Timeline ── */
+.track-timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 48px;
+    padding: 0 10px;
+}
+
+.track-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    position: relative;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+.track-step.done { opacity: 1; }
+
+.track-line {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    width: 100%;
+    height: 3px;
+    background: #eee;
+    z-index: 0;
+    transition: background 0.3s;
+}
+
+.track-line.done { background: tomato; }
+
+.track-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    border: 3px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    z-index: 1;
+    transition: all 0.3s;
+}
+
+.track-step.done .track-icon {
+    background: #fff0ee;
+    border-color: tomato;
+}
+
+.track-step.current .track-icon {
+    background: tomato;
+    border-color: tomato;
+    font-size: 22px;
+    box-shadow: 0 0 0 6px rgba(255,99,71,0.15);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255,99,71,0.4); }
+    70%  { box-shadow: 0 0 0 10px rgba(255,99,71,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,99,71,0); }
+}
+
+.track-label { text-align: center; }
+
+.track-label-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #262626;
+    margin: 0;
+}
+
+.track-label-desc {
+    font-size: 11px;
+    color: #888;
+    margin: 2px 0 0;
+}
+
+/* ── Detail ── */
+.track-detail {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #f0f0f0;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.track-detail h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 16px;
+    color: #262626;
+}
+
+.track-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.track-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    font-size: 14px;
+    color: #505050;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.track-item:last-child { border-bottom: none; }
+
+.track-total {
+    font-weight: 700;
+    color: #262626;
+}
+
+.track-address {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 10px;
+}
+
+.track-address h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #262626;
+    margin: 0 0 8px;
+}
+
+.track-address p {
+    font-size: 13px;
+    color: #666;
+    margin: 3px 0;
+}
+
+.track-note {
+    color: #888 !important;
+    font-style: italic;
+}
+
+.track-payment {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.track-pay-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.track-pay-badge.paid   { background: #d4edda; color: #155724; }
+.track-pay-badge.unpaid { background: #f8d7da; color: #721c24; }
+
+.track-pay-method {
+    font-size: 13px;
+    color: #888;
+}
+
+.track-loading,
+.track-not-found {
+    text-align: center;
+    padding: 80px 20px;
+    color: #888;
+}
+
+.track-not-found a {
+    color: tomato;
+    text-decoration: none;
+    margin-top: 12px;
+    display: block;
+}
+
+.track-invoice-btn {
+    margin-left: auto;
+    padding: 8px 16px;
+    background: tomato;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.track-invoice-btn:hover { opacity: 0.85; }
+
+@media (max-width: 600px) {
+    .track-label-desc { display: none; }
+    .track-icon { width: 36px; height: 36px; font-size: 16px; }
+    .track-payment {
+        flex-wrap: wrap;
+    }
+
+    .track-invoice-btn {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}

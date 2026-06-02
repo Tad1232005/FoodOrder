@@ -11,13 +11,14 @@ import { connectDB } from "./config/db.js";
 import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
-import authRoutes from "./routes/authRoutes.js";
+import authRouter from "./routes/authRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import discountRouter from "./routes/discountRoute.js";
-import 'dotenv/config';
+// import 'dotenv/config';
 import dns from "node:dns/promises";
 import startCronJobs from "./utils/cronJob.js";
-import adminRoutes from "./routes/adminRoutes.js";
+import adminRouter from "./routes/adminRoute.js";
+import reviewRouter from "./routes/reviewRoute.js";
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 // app config
@@ -66,10 +67,12 @@ app.use("/api/food", foodRouter);
 app.use("/images", express.static('uploads'));
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRouter);
 app.use("/api/order", orderRouter);
-app.use("/api/admin", adminRoutes);
+app.use("/api/admin", adminRouter);
 app.use("/api/discount", discountRouter);
+app.use("/api/review", reviewRouter);
+
 app.get("/", (req, res) => {
     res.send("API Working...");
 });

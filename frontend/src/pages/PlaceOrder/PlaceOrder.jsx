@@ -16,7 +16,8 @@ const PlaceOrder = () => {
     street: "",
     city: "",
     state: "",
-    phone: ""
+    phone: "",
+    note: ""
   });
 
   const [paymentMethod, setPaymentMethod] = useState("stripe");
@@ -24,7 +25,7 @@ const PlaceOrder = () => {
 
   // --- QUẢN LÝ MÃ GIẢM GIÁ VÀ THÔNG BÁO ---
   const [promoCode, setPromoCode] = useState("");
-  const [discountInfo, setDiscountInfo] = useState(null); 
+  const [discountInfo, setDiscountInfo] = useState(null);
   const [promoMessage, setPromoMessage] = useState(""); // Lưu chữ báo lỗi/thành công
   const [isPromoError, setIsPromoError] = useState(false); // Xác định màu chữ (đỏ/xanh)
 
@@ -45,15 +46,15 @@ const PlaceOrder = () => {
     const userCity = data.city.trim().toLowerCase();
 
     // CHỖ THAY ĐỔI CHUẨN UX: Nếu chưa nhập gì, trả về 0 (không lấy mặc định 2$ nữa)
-    if (!userCity) return 0; 
+    if (!userCity) return 0;
 
     // Nội thành (gần quán) -> Ship rẻ $1
     if (userCity === "tphcm" || userCity === "hồ chí minh" || userCity === "ho chi minh") {
-      return 1; 
+      return 1;
     }
 
     // Ngoại thành / tỉnh khác (xa quán) -> Ship $5
-    return 5; 
+    return 5;
   };
 
   const deliveryFee = getDynamicDeliveryFee(); // Phí ship gốc dựa theo ô City
@@ -61,7 +62,7 @@ const PlaceOrder = () => {
   // --- 2. HÀM TÍNH SỐ TIỀN GIẢM (TỰ ĐỘNG TÚM THEO PHÍ SHIP ĐỂ TRỪ) ---
   const getDiscountAmount = () => {
     if (!discountInfo || subtotal === 0) return 0;
-    
+
     if (discountInfo.discountType === "freeship") {
       return deliveryFee; // Tiền giảm bằng đúng phí ship gốc tại thời điểm đó (1$ hoặc 5$)
     } else if (discountInfo.discountType === "percent") {
@@ -72,7 +73,7 @@ const PlaceOrder = () => {
   };
 
   const discountAmount = getDiscountAmount();
-  
+
   // Tổng tiền cuối cùng sau khi cộng ship và trừ giảm giá (không âm)
   const totalAmount = Math.max(0, subtotal + deliveryFee - discountAmount);
 
@@ -86,19 +87,19 @@ const PlaceOrder = () => {
     try {
       // Gửi kèm subtotal để check đơn tối thiểu, kèm headers token để lấy userId
       const response = await axios.post(
-        `${url}/api/discount/apply`, 
+        `${url}/api/discount/apply`,
         { code: promoCode, subtotal: subtotal },
         { headers: { token } }
       );
 
       if (response.data.success) {
-        setDiscountInfo(response.data.data); 
+        setDiscountInfo(response.data.data);
         setPromoMessage(response.data.message || "Promo code applied successfully!");
         setIsPromoError(false); // Chữ màu xanh
       } else {
         setPromoMessage(response.data.message || "Invalid promo code!");
         setIsPromoError(true); // Chữ màu đỏ
-        setDiscountInfo(null); 
+        setDiscountInfo(null);
       }
     } catch (error) {
       console.error(error);
@@ -178,6 +179,7 @@ const PlaceOrder = () => {
           <input name="state" onChange={onChangeHandler} value={data.state} type="text" placeholder='State' required />
         </div>
         <input name="phone" onChange={onChangeHandler} value={data.phone} type="text" placeholder='Phone' required />
+        <textarea name="note" onChange={onChangeHandler} value={data.note} placeholder="Order note (optional)..." rows={3}/>
       </div>
 
       {/* CỘT PHẢI: TỔNG TIỀN & THANH TOÁN */}
@@ -192,13 +194,13 @@ const PlaceOrder = () => {
               <p>${subtotal}</p>
             </div>
             <hr />
-            
+
             <div className="cart-total-details">
               <p>Delivery Fee</p>
               <p>
                 {/* Nếu chưa nhập city thì hiện text gợi ý mờ thay vì số $0 */}
-                {data.city.trim() === "" 
-                  ? <span style={{ fontSize: "13px", fontStyle: "italic", color: "#888" }}>Enter city...</span> 
+                {data.city.trim() === ""
+                  ? <span style={{ fontSize: "13px", fontStyle: "italic", color: "#888" }}>Enter city...</span>
                   : `$${deliveryFee}`
                 }
               </p>
@@ -211,8 +213,8 @@ const PlaceOrder = () => {
                 <div className="cart-total-details" style={{ color: "#52c41a", fontWeight: "500" }}>
                   <p>
                     {/* Nếu là mã freeship thì đổi chữ hiển thị cho chuyên nghiệp */}
-                    {discountInfo.discountType === "freeship" 
-                      ? `Free Shipping (${discountInfo.code})` 
+                    {discountInfo.discountType === "freeship"
+                      ? `Free Shipping (${discountInfo.code})`
                       : `Discount (${discountInfo.code})`
                     }
                   </p>
@@ -233,23 +235,23 @@ const PlaceOrder = () => {
         <div className="cart-promocode">
           <p>If you have a promocode, enter it here</p>
           <div className="cart-promocode-input">
-            <input 
-              type="text" 
-              placeholder="Promo Code" 
+            <input
+              type="text"
+              placeholder="Promo Code"
               value={promoCode}
               onChange={(e) => {
                 setPromoCode(e.target.value);
-                setPromoMessage(""); 
+                setPromoMessage("");
               }}
             />
             <button type="button" onClick={handleApplyPromoCode}>Apply</button>
           </div>
-          
+
           {/* HIỂN THỊ THÔNG BÁO LỖI/THÀNH CÔNG Ở ĐÂY */}
           {promoMessage && (
-            <p style={{ 
-              color: isPromoError ? "#ff4d4f" : "#52c41a", 
-              fontSize: "13px", 
+            <p style={{
+              color: isPromoError ? "#ff4d4f" : "#52c41a",
+              fontSize: "13px",
               marginTop: "8px",
               fontWeight: "500",
               textAlign: "left"

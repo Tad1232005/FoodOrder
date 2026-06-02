@@ -25,7 +25,10 @@ export async function removeFood(id) {
 }
 
 export async function updateFood(payload) {
-  const res = await client.post('/api/food/update', payload)
+  const isFormData = payload instanceof FormData
+  const res = await client.post('/api/food/update', payload, isFormData ? {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  } : {})
   return res.data
 }
 

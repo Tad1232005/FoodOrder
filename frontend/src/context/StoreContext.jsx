@@ -9,7 +9,9 @@ const StoreContextProvider = (props) => {
     const url = "http://localhost:4000";
     const [token, setToken] = useState();
     const [food_list, setFoodList] = useState([]);
-    
+    const [foodRatings, setFoodRatings] = useState({});
+
+
     // 1. ĐÃ THÊM STATE TÌM KIẾM Ở ĐÂY
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -65,6 +67,15 @@ const StoreContextProvider = (props) => {
         setFoodList(response.data.data);
     };
 
+    const fetchAllRatings = async () => {
+        try {
+            const res = await axios.get(url + "/api/review/ratings");
+            if (res.data.success) setFoodRatings(res.data.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     // SỬA TẠI ĐÂY: Thêm tham số `localCart` để gửi giỏ hàng tạm lên Backend gộp dữ liệu
     const loadCartData = async (authToken, localCart = {}) => {
         try {
@@ -82,6 +93,7 @@ const StoreContextProvider = (props) => {
     useEffect(() => {
         async function fetchInitialData() {
             await fetchFoodList();
+            await fetchAllRatings();
             const storedToken = localStorage.getItem("token");
             if (storedToken) {
                 setToken(storedToken);
@@ -110,11 +122,12 @@ const StoreContextProvider = (props) => {
         url,
         token,
         setToken,
-        loadCartData, // SỬA TẠI ĐÂY: Xuất hàm này ra để file Login có thể gọi được ngay lập tức!
+        loadCartData,
         clearCart,
         // 2. ĐÃ TRUYỀN SEARCH TERM VÀO CONTEXT VALUE
         searchTerm,
         setSearchTerm,
+        foodRatings,
     };
     return (
         <StoreContext.Provider value={contextValue}>

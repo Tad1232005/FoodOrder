@@ -69,8 +69,8 @@ export default function AdminLayout() {
   return (
     <div className={`adminShell ${sidebarCollapsed ? 'isSidebarCollapsed' : ''} ${mobileMenuOpen ? 'isMobileMenuOpen' : ''}`}>
       {mobileMenuOpen && (
-        <div 
-          className="mobileOverlay" 
+        <div
+          className="mobileOverlay"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
@@ -155,6 +155,15 @@ export default function AdminLayout() {
               %
             </span>
             <span className="adminNav__label">Discount</span>
+          </NavLink>
+
+          <NavLink
+            to="/reviews"
+            onClick={(e) => { guardNav(e, '/reviews'); setMobileMenuOpen(false); }}
+            className={({ isActive }) => `adminNav__link ${isActive ? 'isActive' : ''}`}
+          >
+            <span className="adminNav__icon">R</span>
+            <span className="adminNav__label">Reviews</span>
           </NavLink>
         </nav>
 

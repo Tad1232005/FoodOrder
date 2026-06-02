@@ -1,0 +1,29 @@
+services:
+  # 1. DỊCH VỤ DATABASE (MONGODB)
+
+  # 2. DỊCH VỤ BACKEND
+  backend:
+    build: ./backend
+    container_name: food_order_backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./backend/.env
+
+  # 3. DỊCH VỤ FRONTEND (Trang cho khách)
+  frontend:
+    build: ./frontend
+    container_name: food_order_frontend
+    ports:
+      - "5173:80" # Truy cập ở http://localhost:5173
+    depends_on:
+      - backend
+
+  # 4. DỊCH VỤ ADMIN (Trang quản trị)
+  admin:
+    build: ./admin
+    container_name: food_order_admin
+    ports:
+      - "5174:80" # Truy cập trang Admin ở http://localhost:5174
+    depends_on:
+      - backend

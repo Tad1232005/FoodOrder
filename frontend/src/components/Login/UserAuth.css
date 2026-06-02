@@ -1,10 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap');
 
-/* ── Shell ──────────────────────────────────────────────────────────────────
-   position: relative → bắt buộc để canvas absolute định vị đúng bên trong
-   min-height: 100vh  → đảm bảo luôn full màn hình
-   overflow: hidden   → canvas không tràn ra ngoài
-*/
+/* ── Shell ── */
 .ua-shell {
   position: relative;
   width: 100%;
@@ -12,65 +8,54 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #07070f;
+  background: #1a0a00;
   font-family: 'DM Sans', 'Segoe UI', sans-serif;
   padding: 24px 16px;
   overflow: hidden;
 }
 
-/* ── Card ───────────────────────────────────────────────────────────────────
-   z-index: 10 → nằm trên canvas (z-index mặc định)
-   max-height + overflow-y → scroll được trên mobile khi content dài
-*/
+/* ── Card ── */
 .ua-card {
   position: relative;
   z-index: 10;
   width: 100%;
   max-width: 400px;
   max-height: calc(100vh - 48px);
-  /* 48px = padding top+bottom của shell */
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 140, 0, 0.2);
   border-radius: 24px;
   padding: 36px 32px 32px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 8px 48px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 140, 0, 0.06),
+    inset 0 1px 0 rgba(255, 200, 100, 0.1);
   animation: ua-fadein 0.35s ease;
-  /* Ẩn scrollbar nhưng vẫn scroll được */
   scrollbar-width: none;
 }
 
-.ua-card::-webkit-scrollbar {
-  display: none;
-}
+.ua-card::-webkit-scrollbar { display: none; }
 
 @keyframes ua-fadein {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Hero: GIF + title ── */
+/* ── Hero ── */
 .ua-hero {
   text-align: center;
   margin-bottom: 28px;
 }
 
-/* Kích thước GIF trong card — chỉnh width/height ở đây */
 .ua-capoo {
   width: 88px;
   height: 88px;
   object-fit: contain;
   border-radius: 50%;
-  background: rgba(91, 155, 213, 0.1);
+  background: rgba(255, 120, 0, 0.12);
+  border: 2px solid rgba(255, 140, 0, 0.25);
   padding: 4px;
   margin-bottom: 12px;
 }
@@ -90,7 +75,7 @@
   margin: 0;
 }
 
-/* ── General error banner ── */
+/* ── Error banner ── */
 .ua-general-err {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
@@ -103,29 +88,25 @@
 }
 
 /* ── Field ── */
-.ua-field {
-  margin-bottom: 16px;
-}
+.ua-field { margin-bottom: 16px; }
 
 .ua-label {
   display: block;
   font-size: 11px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 200, 120, 0.55);
   letter-spacing: 0.6px;
   text-transform: uppercase;
   margin-bottom: 6px;
 }
 
-.ua-input-wrap {
-  position: relative;
-}
+.ua-input-wrap { position: relative; }
 
 .ua-input {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 140, 0, 0.18);
   border-radius: 10px;
   padding: 10px 40px 10px 14px;
   font-size: 14px;
@@ -135,14 +116,12 @@
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
-.ua-input::placeholder {
-  color: rgba(255, 255, 255, 0.2);
-}
+.ua-input::placeholder { color: rgba(255, 255, 255, 0.18); }
 
 .ua-input:focus {
-  border-color: rgba(91, 155, 213, 0.65);
-  background: rgba(91, 155, 213, 0.07);
-  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.12);
+  border-color: rgba(255, 140, 0, 0.6);
+  background: rgba(255, 120, 0, 0.07);
+  box-shadow: 0 0 0 3px rgba(255, 120, 0, 0.1);
 }
 
 .ua-field--err .ua-input {
@@ -165,7 +144,7 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 200, 120, 0.4);
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -174,15 +153,11 @@
   border-radius: 6px;
   transition: color 0.2s;
   margin: 0;
-  letter-spacing: 0;
-  font-size: inherit;
-  text-transform: none;
   width: auto;
 }
 
 .ua-eye:hover {
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0;
+  color: rgba(255, 200, 120, 0.85);
   transform: translateY(-50%);
 }
 
@@ -192,35 +167,29 @@
   margin-top: 8px;
   margin-left: 0;
   margin-right: 0;
-  padding: 12px;
-  background: linear-gradient(135deg, #3a7abd, #5b9bd5);
+  padding: 13px;
+  background: linear-gradient(135deg, #e85d04, #ff8c00, #ffb347);
   border: none;
   border-radius: 10px;
   color: #fff;
   font-family: 'Syne', sans-serif;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
   text-transform: none;
-  box-shadow: 0 4px 20px rgba(58, 122, 189, 0.35);
-  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 24px rgba(232, 93, 4, 0.45);
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 
 .ua-btn:hover:not(:disabled) {
-  opacity: 0.9;
+  opacity: 0.92;
   transform: translateY(-1px);
-  letter-spacing: 0.3px;
+  box-shadow: 0 6px 32px rgba(232, 93, 4, 0.55);
 }
 
-.ua-btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.ua-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
+.ua-btn:active:not(:disabled) { transform: scale(0.98); }
+.ua-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* ── Spinner ── */
 .ua-spinner {
@@ -234,11 +203,7 @@
   vertical-align: middle;
 }
 
-@keyframes ua-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+@keyframes ua-spin { to { transform: rotate(360deg); } }
 
 /* ── Switch link ── */
 .ua-switch {
@@ -249,40 +214,39 @@
 }
 
 .ua-switch span {
-  color: #5b9bd5;
+  color: #ff8c00;
   cursor: pointer;
   font-weight: 500;
   margin: 0;
   transition: color 0.2s;
 }
 
-.ua-switch span:hover {
-  color: #7fb3e0;
+.ua-switch span:hover { color: #ffb347; }
+
+/* ── Divider ── */
+.ua-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 20px;
+}
+.ua-divider::before,
+.ua-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,140,0,0.25), transparent);
+}
+.ua-divider span {
+  font-size: 11px;
+  color: rgba(255,200,100,0.35);
+  letter-spacing: 1px;
 }
 
-/* ── Responsive mobile ──────────────────────────────────────────────────────
-  Trên mobile không đủ chỗ, thu nhỏ padding + GIF
-  Shell dùng align-items: flex-start để card scroll từ trên xuống
-*/
+/* ── Mobile ── */
 @media (max-width: 480px) {
-  .ua-shell {
-    align-items: flex-start;
-    padding: 16px 12px;
-  }
-
-  .ua-card {
-    max-height: none;
-    /* mobile thì scroll page thay vì scroll card */
-    padding: 24px 18px 20px;
-    border-radius: 18px;
-  }
-
-  .ua-capoo {
-    width: 70px;
-    height: 70px;
-  }
-
-  .ua-title {
-    font-size: 20px;
-  }
+  .ua-shell { align-items: flex-start; padding: 16px 12px; }
+  .ua-card  { max-height: none; padding: 24px 18px 20px; border-radius: 18px; }
+  .ua-capoo { width: 70px; height: 70px; }
+  .ua-title { font-size: 20px; }
 }

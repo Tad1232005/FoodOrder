@@ -25,6 +25,11 @@ const generateCode = () => String(Math.floor(100000 + Math.random() * 900000));
 // ── Login ──────────────────────────────────────────────────────────────────
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
+      // Chặn NoSQL injection
+    if (typeof email !== "string" || typeof password !== "string") {
+        return res.json({ success: false, message: "Invalid input" });
+    }
+    
     try {
         const user = await userModel.findOne({ email });
         if (!user) return res.json({ success: false, message: "This account does not exist!" });
