@@ -1,31 +1,39 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const RESEND_FROM = process.env.RESEND_FROM || "onboarding@resend.dev";
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const SENDGRID_FROM = process.env.SENDGRID_FROM;
 
 async function sendEmail({ to, subject, html }) {
-    if (!RESEND_API_KEY) {
-        throw new Error("Missing RESEND_API_KEY");
+    if (!SENDGRID_API_KEY) {
+        throw new Error("Missing SENDGRID_API_KEY");
+    }
+    if (!SENDGRID_FROM) {
+        throw new Error("Missing SENDGRID_FROM");
     }
 
-    const resp = await fetch("https://api.resend.com/emails", {
+    const resp = await fetch("https://api.sendgrid.com/v3/mail/send", {
         method: "POST",
         headers: {
-            Authorization: `Bearer ${RESEND_API_KEY}`,
+            Authorization: `Bearer ${SENDGRID_API_KEY}`,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            from: RESEND_FROM,
-            to: Array.isArray(to) ? to : [to],
-            subject,
-            html,
+            personalizations: [
+                {
+                    to: (Array.isArray(to) ? to : [to]).map((email) => ({ email })),
+                    subject,
+                },
+            ],
+            from: { email: SENDGRID_FROM, name: "FoodOrder" },
+            content: [{ type: "text/html", value: html }],
         }),
     });
 
-    if (!resp.ok) {
+    // SendGrid returns 202 Accepted on success
+    if (resp.status !== 202) {
         const text = await resp.text().catch(() => "");
-        throw new Error(`Resend error ${resp.status}: ${text}`);
+        throw new Error(`SendGrid error ${resp.status}: ${text}`);
     }
 }
 
