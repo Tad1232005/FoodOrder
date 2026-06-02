@@ -36,10 +36,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy Backend to Render
-        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
 
       - name: Deploy Frontend to Vercel
-        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK_FRONTEND }}
+        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_FRONTEND }}"
 
       - name: Deploy Admin to Vercel
-        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK_ADMIN }}
+        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_ADMIN }}"
