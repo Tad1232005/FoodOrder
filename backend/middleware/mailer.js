@@ -10,6 +10,10 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
+    // Tránh request "treo" vô hạn khi SMTP chậm/bị chặn trên host
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
 });
 
 // Gửi mã xác thực 6 số
@@ -29,10 +33,4 @@ export const sendVerifyEmail = async (toEmail, code) => {
     });
 };
 
-transporter.verify((error, success) => {
-    if (error) {
-        console.log(error);
-    } else {
-        console.log("Mail server ready");
-    }
-}); 
+// Không verify ngay lúc startup để tránh deploy bị chậm/treo vì DNS/SMTP

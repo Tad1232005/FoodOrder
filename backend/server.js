@@ -1,8 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-console.log(process.env.EMAIL_USER);
-console.log(process.env.EMAIL_PASS);
 console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
 
 import express from "express";
@@ -23,7 +21,31 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 // app config
 const app = express();
-const port = 4000;
+const port = Number(process.env.PORT) || 4000;
+
+// Khai báo danh sách tất cả các trang web được phép gọi API của bạn
+const allowedOrigins = new Set(
+    [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        process.env.FRONTEND_URL,
+        process.env.ADMIN_URL,
+        "https://food-order-theta-tan.vercel.app", // fallback
+        "https://admin-gamma-eight-67.vercel.app", // fallback
+    ].filter(Boolean)
+);
+const isAllowedOrigin = (origin) => {
+    if (!origin) return true;
+    if (allowedOrigins.has(origin)) return true;
+    // Allow Vercel preview deployments
+    try {
+        const { hostname, protocol } = new URL(origin);
+        if (protocol !== "https:") return false;
+        return hostname.endsWith(".vercel.app");
+    } catch {
+        return false;
+    }
+};
 
 app.set('trust proxy', 1);
 
@@ -57,9 +79,18 @@ const customMongoSanitize = (req, res, next) => {
 // middleware
 app.use(express.json());
 app.use(cors({
-    origin: "https://food-order-theta-tan.vercel.app", // Link frontend của bạn (không có dấu / ở cuối)
+    origin: function (origin, callback) {
+        // Cho phép các request không có origin (như Postman hoặc thiết bị test)
+        if (!origin) return callback(null, true);
+        
+        if (isAllowedOrigin(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Bị chặn bởi cơ chế CORS của Backend!"));
+        }
+    },
     credentials: true
-}));
+}));;
 
 // Kích hoạt màng lọc
 app.use(customMongoSanitize);
