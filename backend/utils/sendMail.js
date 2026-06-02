@@ -12,7 +12,8 @@ export const sendInviteEmail = async ({ to, name, role, link }) => {
         // Thêm dòng này để tránh bị một số môi trường (hoặc antivirus ở local) chặn chứng chỉ
         tls: {
             rejectUnauthorized: false
-        }
+        },
+        family: 4
     });
 
     await transporter.sendMail({
