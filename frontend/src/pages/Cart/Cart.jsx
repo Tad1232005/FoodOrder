@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import './Cart.css';
 import { StoreContext } from '../../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../../components/SEO/SEO';
 
 const Cart = () => {
   const { cartItems, food_list, removeFromCart, getTotalCartAmount, url,token } = useContext(StoreContext);
@@ -34,6 +35,7 @@ const Cart = () => {
 
   return (
     <div className='cart'>
+      <SEO title="Your Cart" description="Review your order before checkout" />
       <div className="cart-items">
         <div className="cart-items-title">
           <p>Items</p>
@@ -58,7 +60,7 @@ const Cart = () => {
               return (
                 <div key={index}>
                   <div className='cart-items-title cart-items-item'>
-                    <img src={url+"/images/"+item.image} alt="" />
+                    <img src={url+"/images/"+item.images} alt="" />
                     <p>{item.name}</p>
                     <p>${item.price}</p>
                     <p>{cartItems[item._id]}</p>

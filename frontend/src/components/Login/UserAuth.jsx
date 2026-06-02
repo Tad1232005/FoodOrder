@@ -7,18 +7,35 @@ import { useNavigate } from "react-router-dom";
 
 const EMAIL_REGEX = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
-// ─── useField: quản lý value + error cho từng input ────────────────────────
+// ─── Emoji đồ ăn bay trên nền ─────────────────────────────────────────────
+const FOOD_EMOJIS = ["🍗", "🍟", "🍔", "🌭", "🍕", "🥤", "🍦", "🧁", "🥨", "🍩"];
+
+// ─── useField ─────────────────────────────────────────────────────────────
 function useField(initial = "") {
   const [value, setValue] = useState(initial);
   const [error, setError] = useState("");
   const onChange = useCallback((e) => {
     setValue(e.target.value);
-    setError(""); // xóa lỗi khi user gõ lại
+    setError("");
   }, []);
   return { value, error, setError, onChange, setValue };
 }
 
-// ─── Field: input có label, error msg, show/hide password ─────────────────
+// ─── usePingGif: force GIF loop mãi mãi bằng cách reset src định kỳ ──────
+function usePingGif(ref, intervalMs = 2800) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const id = setInterval(() => {
+      const src = el.src;
+      el.src = "";
+      el.src = src;
+    }, intervalMs);
+    return () => clearInterval(id);
+  }, [ref, intervalMs]);
+}
+
+// ─── Field ────────────────────────────────────────────────────────────────
 function Field({ label, type = "text", placeholder, field, onChangeOverride }) {
   const [show, setShow] = useState(false);
   const isPassword = type === "password";
@@ -35,7 +52,6 @@ function Field({ label, type = "text", placeholder, field, onChangeOverride }) {
           className="ua-input"
           autoComplete="off"
         />
-        {/* Nút ẩn/hiện mật khẩu */}
         {isPassword && (
           <button type="button" className="ua-eye" onClick={() => setShow((s) => !s)} tabIndex={-1}>
             {show ? (
@@ -57,9 +73,8 @@ function Field({ label, type = "text", placeholder, field, onChangeOverride }) {
   );
 }
 
-// ─── StarCanvas: vẽ nền sao + particles bằng canvas ───────────────────────
-// rootRef: ref của .ua-shell để canvas biết kích thước và lắng nghe mousemove
-function StarCanvas({ rootRef }) {
+// ─── FoodCanvas: TỐI ƯU HÓA NEBULA NỀN (BỎ getBoundingClientRect khi move) ───
+function FoodCanvas({ rootRef }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -68,107 +83,113 @@ function StarCanvas({ rootRef }) {
     if (!root || !canvas) return;
     const ctx = canvas.getContext("2d");
 
-    // Resize canvas theo kích thước shell
+    // Bộ nhớ đệm tọa độ vùng chứa - chỉ đo khi resize, tránh giật lag khi move chuột
+    let rootRect = root.getBoundingClientRect();
+
     function resize() {
-      canvas.width = root.offsetWidth;
+      canvas.width  = root.offsetWidth;
       canvas.height = root.offsetHeight;
+      rootRect = root.getBoundingClientRect();
     }
     resize();
     window.addEventListener("resize", resize);
 
-    // ── Tạo 70 ngôi sao, mỗi sao có vị trí, tốc độ nhấp nháy riêng ──
-    const STARS = Array.from({ length: 70 }, () => ({
-      x: Math.random() * canvas.width,
-      baseY: Math.random() * canvas.height, // vị trí Y gốc để tính dao động
-      y: 0,
-      r: Math.random() * 1.7 + 0.3,         // bán kính 0.3–2px
-      speed: Math.random() * 0.5 + 0.15,    // tốc độ dao động dọc
-      amp: Math.random() * 22 + 8,           // biên độ dao động (px)
-      phase: Math.random() * Math.PI * 2,    // phase lệch nhau để không đồng bộ
-      tw: Math.random() * Math.PI * 2,       // twinkle phase
-      tws: Math.random() * 0.045 + 0.01,    // twinkle speed — tăng để nhấp nháy nhanh hơn
+    const items = Array.from({ length: 35 }, () => ({
+      emoji:    FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)],
+      x:        Math.random() * (canvas.width || 800),
+      y:        Math.random() * (canvas.height || 600),
+      baseY:    0,
+      size:     Math.random() * 18 + 10,
+      speed:    Math.random() * 1.5 + 2,
+      amp:      Math.random() * 25 + 10,
+      phase:    Math.random() * Math.PI * 2,
+      alpha:    Math.random() * 0.35 + 0.08,
+      rot:      Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.05,
+      drift:    (Math.random() - 0.5) * 1.5,
     }));
-    STARS.forEach((s) => { s.y = s.baseY; });
+    items.forEach((it) => { it.baseY = it.y; });
 
-    // ── Tạo 40 particles màu xanh nhạt, phân tán khi chuột lại gần ──
-    const PARTS = Array.from({ length: 40 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.2 + 0.3,
-      vx: (Math.random() - 0.5) * 0.3,  // vận tốc ngang ban đầu
-      vy: (Math.random() - 0.5) * 0.3,  // vận tốc dọc ban đầu
-      a: Math.random() * 0.35 + 0.1,    // độ trong suốt
+    const parts = Array.from({ length: 30 }, () => ({
+      x:  Math.random() * (canvas.width  || 800),
+      y:  Math.random() * (canvas.height || 600),
+      r:  Math.random() * 1.5 + 0.4,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      a:  Math.random() * 0.3 + 0.08,
     }));
 
-    let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
-    let t = 0; // thời gian tích lũy, dùng để tính sin/cos
+    let mouse = { x: (canvas.width || 800) / 2, y: (canvas.height || 600) / 2 };
+    let t = 0;
     let raf;
 
     function onMouseMove(e) {
-      const r = root.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
+      // Sử dụng rootRect đã được cache từ trước, không tính toán lại layout nữa
+      mouse.x = e.clientX - rootRect.left;
+      mouse.y = e.clientY - rootRect.top;
     }
     root.addEventListener("mousemove", onMouseMove);
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#07070f";
+
+      ctx.fillStyle = "#1a0a00";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      t += 0.016; // ~60fps increment — tăng để animation nhanh hơn
+      t += 0.025;
 
-      // Vẽ sao
-      for (const s of STARS) {
-        s.tw += s.tws; // cập nhật twinkle
-        // dao động dọc theo sin
-        s.y = s.baseY + Math.sin(t * s.speed * 2 + s.phase) * s.amp;
-        if (s.y < 0) s.y = canvas.height;
-        if (s.y > canvas.height) s.y = 0;
-        const al = 0.4 + 0.6 * Math.sin(s.tw); // độ sáng nhấp nháy 0.4–1.0
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${al})`;
-        ctx.fill();
-        // Sao lớn vẽ thêm cross (dấu +) để lung linh hơn
-        if (s.r > 1.3) {
-          ctx.strokeStyle = `rgba(255,255,255,${al * 0.4})`;
-          ctx.lineWidth = 0.5;
-          ctx.beginPath();
-          ctx.moveTo(s.x - s.r * 3, s.y); ctx.lineTo(s.x + s.r * 3, s.y);
-          ctx.moveTo(s.x, s.y - s.r * 3); ctx.lineTo(s.x, s.y + s.r * 3);
-          ctx.stroke();
-        }
-      }
-
-      // Nebula: gradient tròn màu xanh nhạt ở góc trái
       const nb = ctx.createRadialGradient(
-        canvas.width * 0.35, canvas.height * 0.4, 0,
-        canvas.width * 0.35, canvas.height * 0.4, 200 // 200px radius — tăng để to hơn
+        canvas.width * 0.3, canvas.height * 0.45, 0,
+        canvas.width * 0.3, canvas.height * 0.45, 240
       );
-      nb.addColorStop(0, "rgba(58,122,189,0.09)");
+      nb.addColorStop(0, "rgba(232,93,4,0.07)");
       nb.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = nb;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Vẽ particles, đẩy ra khi chuột lại gần trong 100px
-      for (const p of PARTS) {
+      const nb2 = ctx.createRadialGradient(
+        canvas.width * 0.75, canvas.height * 0.6, 0,
+        canvas.width * 0.75, canvas.height * 0.6, 180
+      );
+      nb2.addColorStop(0, "rgba(255,180,0,0.05)");
+      nb2.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = nb2;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (const it of items) {
+        it.rot  += it.rotSpeed;
+        it.x    += it.drift;
+        it.y     = it.baseY + Math.sin(t * it.speed * 2 + it.phase) * it.amp;
+
+        if (it.x < -30)               it.x = canvas.width  + 30;
+        if (it.x > canvas.width + 30) it.x = -30;
+        if (it.y < -30)               it.baseY = canvas.height + 30;
+        if (it.y > canvas.height + 30) it.baseY = -30;
+
+        ctx.save();
+        ctx.globalAlpha = it.alpha;
+        ctx.translate(it.x, it.y);
+        ctx.rotate(it.rot);
+        ctx.font = `${it.size}px serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(it.emoji, 0, 0);
+        ctx.restore();
+      }
+
+      for (const p of parts) {
         const dx = mouse.x - p.x, dy = mouse.y - p.y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 100) {
-          // đẩy ngược chiều chuột — tăng 0.025 để đẩy mạnh hơn
-          p.vx -= (dx / d) * 0.025;
-          p.vy -= (dy / d) * 0.025;
-        }
-        p.vx *= 0.98; p.vy *= 0.98; // ma sát để particle dần dừng lại
-        p.x += p.vx; p.y += p.vy;
-        // wrap around khi ra ngoài màn hình
-        if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < 100) { p.vx -= (dx / d) * 0.03; p.vy -= (dy / d) * 0.03; }
+        p.vx *= 0.98; p.vy *= 0.98;
+        p.x  += p.vx;  p.y  += p.vy;
+        if (p.x < 0) p.x = canvas.width;  if (p.x > canvas.width)  p.x = 0;
         if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(91,155,213,${p.a})`;
+        ctx.fillStyle = `rgba(255,140,0,${p.a})`;
         ctx.fill();
       }
+
       raf = requestAnimationFrame(draw);
     }
     raf = requestAnimationFrame(draw);
@@ -188,49 +209,42 @@ function StarCanvas({ rootRef }) {
         inset: 0,
         width: "100%",
         height: "100%",
-        pointerEvents: "none", // không chặn click/hover của các element bên trên
+        pointerEvents: "none",
       }}
     />
   );
 }
 
-// ─── CapooFollower: con capoo chạy theo chuột ─────────────────────────────
-// dùng lerp (linear interpolation) để chuyển động mượt, không teleport ngay
-// ─── CapooFollower: con capoo chạy theo chuột ─────────────────────────────
-// ✅ FIX: dùng imgRef thao tác DOM trực tiếp thay vì setState
-// → GIF không bị re-mount → không restart → loop mãi mãi
-function CapooFollower({ rootRef }) {
-  const imgRef = useRef(null);
+// ─── MouseFollower: ĐÙI GÀ THEO CHUỘT SIÊU MƯỢT (GPU ACCELERATION + FIXED TỔNG) ───
+function MouseFollower() {
+  const elRef = useRef(null);
 
   useEffect(() => {
-    const root = rootRef.current;
-    const img = imgRef.current;
-    if (!root || !img) return;
+    const el = elRef.current;
+    if (!el) return;
 
     let fx = 0, fy = 0, prevFx = 0;
     let raf;
-    let mouse = { x: 0, y: 0 };
+    let mouse = { x: -200, y: -200 };
 
     function onMouseMove(e) {
-      const r = root.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
+      // Lấy trực tiếp tọa độ Viewport toàn màn hình, bỏ getBoundingClientRect
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
     }
-    root.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mousemove", onMouseMove);
 
     function animate() {
       prevFx = fx;
-      fx += (mouse.x - fx) * 0.09;
-      fy += (mouse.y - 40 - fy) * 0.09;
+      fx += (mouse.x - fx) * 0.25;
+      fy += (mouse.y - 10 - fy) * 0.25; // Đẩy nhẹ Y lên đầu mũi tên chuột
 
-      const dx = fx - prevFx;
+      const dx    = fx - prevFx;
       const angle = Math.max(-28, Math.min(28, dx * 2.2));
       const flipX = dx < -1;
 
-      // ✅ Thao tác DOM trực tiếp — không trigger re-render → GIF không restart
-      img.style.left = `${fx}px`;
-      img.style.top = `${fy}px`;
-      img.style.transform = `translate(-50%, -50%) scaleX(${flipX ? -1 : 1}) rotate(${angle}deg)`;
+      // Sử dụng translate3d kích hoạt Card đồ họa (GPU), không dùng left/top để tránh Re-layout
+      el.style.transform = `translate3d(calc(${fx}px - 50%), calc(${fy}px - 50%), 0) scaleX(${flipX ? -1 : 1}) rotate(${angle}deg)`;
 
       raf = requestAnimationFrame(animate);
     }
@@ -238,40 +252,42 @@ function CapooFollower({ rootRef }) {
 
     return () => {
       cancelAnimationFrame(raf);
-      root.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mousemove", onMouseMove);
     };
-  }, [rootRef]);
+  }, []);
 
   return (
-    <img
-      ref={imgRef}
-      src={capooGif}
-      alt=""
+    <div
+      ref={elRef}
       style={{
-        position: "absolute",
-        left: -100,   // ẩn lúc đầu, chờ mouse move
-        top: -100,
-        width: 65,
-        height: 65,
-        objectFit: "contain",
-        zIndex: 3,
-        pointerEvents: "none",
-        userSelect: "none",
-        borderRadius: "50%",
-        // ✅ KHÔNG có transform ở đây — để useEffect set trực tiếp
+        position:     "fixed", // Chuyển sang fixed để thoát ly hoàn toàn và bay tự do
+        left:         0,
+        top:          0,
+        transform:    "translate3d(-200px, -200px, 0)", 
+        fontSize:     "42px",  // Cỡ đùi gà lớn, sắc nét
+        zIndex:       9999,    // zIndex cực lớn để Đùi gà luôn bay TRÊN Form đăng nhập
+        pointerEvents:"none",  // Chuột xuyên qua để click được nút bấm bên dưới
+        userSelect:   "none",
+        willChange:   "transform", // Báo hiệu trước cho trình duyệt tối ưu phần cứng
+        filter:       "drop-shadow(0 5px 8px rgba(0,0,0,0.55))",
       }}
-    />
+    >
+      🍗
+    </div>
   );
 }
 
 // ─── LoginForm ─────────────────────────────────────────────────────────────
 function LoginForm({ onSwitch }) {
   const { url, setToken, cartItems, loadCartData } = useContext(StoreContext);
-  const navigate = useNavigate();
-  const email = useField();
-  const password = useField();
-  const [busy, setBusy] = useState(false);
+  const navigate  = useNavigate();
+  const email     = useField();
+  const password  = useField();
+  const capooRef  = useRef(null);
+  const [busy, setBusy]               = useState(false);
   const [generalError, setGeneralError] = useState("");
+
+  usePingGif(capooRef, 2800); // Logo Capoo đứng yên trong Form vẫn giữ nguyên loop
 
   const validate = () => {
     let ok = true;
@@ -289,21 +305,15 @@ function LoginForm({ onSwitch }) {
     setGeneralError("");
     try {
       const res = await axios.post(`${url}/api/user/login`, {
-        email: email.value.trim(),
+        email:    email.value.trim(),
         password: password.value,
       });
       if (res.data.success) {
-        //Đã verify email
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
-
-        // SỬA TẠI ĐÂY: Gọi đồng bộ giỏ hàng NGAY LẬP TỨC trước khi chuyển trang
-        // Truyền token mới nhận kèm theo danh sách sản phẩm đang có trên màn hình lên Server gộp dữ liệu
         await loadCartData(res.data.token, cartItems);
-        navigate("/"); // về trang chủ sau khi login thành công
-      }
-      else if (res.data.needVerify) {
-        //Chưa verify email
+        navigate("/");
+      } else if (res.data.needVerify) {
         localStorage.setItem("verifyEmail", res.data.email);
         navigate("/verify-email");
       } else {
@@ -319,10 +329,12 @@ function LoginForm({ onSwitch }) {
   return (
     <form className="ua-form" onSubmit={handleSubmit} noValidate>
       <div className="ua-hero">
-        <img src={capooGif} alt="Capoo" className="ua-capoo" />
-        <h1 className="ua-title">Welcome back</h1>
-        <p className="ua-subtitle">Sign in to your account</p>
+        <img ref={capooRef} src={capooGif} alt="Capoo" className="ua-capoo" />
+        <h1 className="ua-title">Welcome back 🍗</h1>
+        <p className="ua-subtitle">Sign in to order your meal</p>
       </div>
+
+      <div className="ua-divider"><span>YOUR ACCOUNT</span></div>
 
       {generalError && <div className="ua-general-err">{generalError}</div>}
 
@@ -342,11 +354,11 @@ function LoginForm({ onSwitch }) {
       />
 
       <button className="ua-btn" type="submit" disabled={busy}>
-        {busy ? <span className="ua-spinner" /> : "Sign in"}
+        {busy ? <span className="ua-spinner" /> : "Sign in & Order 🍟"}
       </button>
 
       <p className="ua-switch">
-        Don't have an account? <span onClick={onSwitch}>Register</span>
+        New here? <span onClick={onSwitch}>Create account</span>
       </p>
     </form>
   );
@@ -354,19 +366,22 @@ function LoginForm({ onSwitch }) {
 
 // ─── RegisterForm ──────────────────────────────────────────────────────────
 function RegisterForm({ onSwitch }) {
-  const { url, setToken } = useContext(StoreContext);
+  const { url }  = useContext(StoreContext);
   const navigate = useNavigate();
   const username = useField();
-  const email = useField();
+  const email     = useField();
   const password = useField();
-  const confirm = useField();
-  const [busy, setBusy] = useState(false);
+  const confirm  = useField();
+  const capooRef = useRef(null);
+  const [busy, setBusy]               = useState(false);
   const [generalError, setGeneralError] = useState("");
+
+  usePingGif(capooRef, 2800);
 
   const validate = () => {
     let ok = true;
     if (!username.value.trim()) { username.setError("Username is required"); ok = false; }
-    else if (username.value.trim().length < 3) { username.setError("At least 3 characters"); ok = false; }
+    else if (username.value.trim().length < 3)  { username.setError("At least 3 characters"); ok = false; }
     else if (username.value.trim().length > 20) { username.setError("Max 20 characters"); ok = false; }
     if (!email.value.trim()) { email.setError("Email is required"); ok = false; }
     else if (!EMAIL_REGEX.test(email.value.trim())) { email.setError("Invalid email format"); ok = false; }
@@ -384,14 +399,13 @@ function RegisterForm({ onSwitch }) {
     setGeneralError("");
     try {
       const res = await axios.post(`${url}/api/user/register`, {
-        name: username.value.trim(),
-        email: email.value.trim(),
+        name:     username.value.trim(),
+        email:    email.value.trim(),
         password: password.value,
       });
       if (res.data.success) {
-        //Chưa xác thực k cấp token
         localStorage.setItem("verifyEmail", res.data.email);
-        navigate("/verify-email"); // về trang chủ sau khi register thành công
+        navigate("/verify-email");
       } else {
         setGeneralError(res.data.message || "Registration failed");
       }
@@ -405,10 +419,12 @@ function RegisterForm({ onSwitch }) {
   return (
     <form className="ua-form" onSubmit={handleSubmit} noValidate>
       <div className="ua-hero">
-        <img src={capooGif} alt="Capoo" className="ua-capoo" />
-        <h1 className="ua-title">Create account</h1>
-        <p className="ua-subtitle">Join us and start your journey</p>
+        <img ref={capooRef} src={capooGif} alt="Capoo" className="ua-capoo" />
+        <h1 className="ua-title">Join us 🍔</h1>
+        <p className="ua-subtitle">Create an account to start ordering</p>
       </div>
+
+      <div className="ua-divider"><span>NEW ACCOUNT</span></div>
 
       {generalError && <div className="ua-general-err">{generalError}</div>}
 
@@ -416,7 +432,7 @@ function RegisterForm({ onSwitch }) {
         onChangeOverride={(e) => {
           username.onChange(e);
           const v = e.target.value.trim();
-          if (v && v.length < 3) username.setError("At least 3 characters");
+          if (v && v.length < 3)  username.setError("At least 3 characters");
           else if (v.length > 20) username.setError("Max 20 characters");
           else username.setError("");
         }}
@@ -446,7 +462,7 @@ function RegisterForm({ onSwitch }) {
       />
 
       <button className="ua-btn" type="submit" disabled={busy}>
-        {busy ? <span className="ua-spinner" /> : "Register"}
+        {busy ? <span className="ua-spinner" /> : "Create account 🎉"}
       </button>
 
       <p className="ua-switch">
@@ -462,15 +478,14 @@ export default function UserAuth() {
   const rootRef = useRef(null);
 
   return (
-    // position: relative cần thiết để canvas absolute định vị đúng trong shell
     <div ref={rootRef} className="ua-shell">
-      <StarCanvas rootRef={rootRef} />
-      <CapooFollower rootRef={rootRef} />
+      <FoodCanvas rootRef={rootRef} />   {/* Nền canvas đồ ăn bay đã tối ưu */}
+      <MouseFollower />                  {/* Đùi gà bay mượt 60fps, luôn trên cùng */}
 
       <div className="ua-card">
         {isLogin
-          ? <LoginForm onSwitch={() => setIsLogin(false)} />
-          : <RegisterForm onSwitch={() => setIsLogin(true)} />
+          ? <LoginForm    onSwitch={() => setIsLogin(false)} />
+          : <RegisterForm onSwitch={() => setIsLogin(true)}  />
         }
       </div>
     </div>

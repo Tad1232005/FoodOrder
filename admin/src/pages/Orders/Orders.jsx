@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import parcelIcon from "../../../../admin/src/assets/parcel_icon.png";
+import parcelIcon from "../../assets/parcel_icon.png";
 import "./Orders.css";
+import ConfirmDialog from "../../components/Modal/ConfirmDialog.jsx";
 
 const Orders = ({ url }) => {
   const [orders, setOrders] = useState([]);
@@ -12,12 +13,13 @@ const Orders = ({ url }) => {
   const [searchText, setSearchText] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [confirmModal, setConfirmModal] = useState({ open: false, orderId: null });
   const token = localStorage.getItem("token");
 
   const fetchAllOrders = async () => {
-    const response = await axios.get(url + "/api/order/list",{ headers: { token } });
-    
-    
+    const response = await axios.get(url + "/api/order/list", { headers: { token } });
+
+
     if (response.data.success) {
       const sorted = response.data.data.sort((a, b) => new Date(b.date) - new Date(a.date));
       setOrders(sorted);
@@ -40,7 +42,7 @@ const Orders = ({ url }) => {
 
   // Nút Mark as Paid riêng cho COD
   const markAsPaid = async (orderId) => {
-    const response = await axios.post(url + "/api/order/markpaid", 
+    const response = await axios.post(url + "/api/order/markpaid",
       { orderId },
       { headers: { token } }
     );
@@ -52,10 +54,9 @@ const Orders = ({ url }) => {
     }
   };
 
-  const deleteOrder = async (orderId) => {
-    if (!window.confirm("Xóa đơn hàng này?")) return;
-    const response = await axios.post(url + "/api/order/delete", 
-      { orderId },
+  const deleteOrder = async () => {
+    const response = await axios.post(url + "/api/order/delete",
+      { orderId: confirmModal.orderId },
       { headers: { token } }
     );
     if (response.data.success) {
@@ -64,6 +65,7 @@ const Orders = ({ url }) => {
     } else {
       toast.error("Error deleting order");
     }
+    setConfirmModal({ open: false, orderId: null });
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -199,6 +201,11 @@ const Orders = ({ url }) => {
                 <p>{order.address.city + ", " + order.address.state}</p>
               </div>
               <p className="order-item-phone">{order.address.phone}</p>
+              {order.address.note && (
+                <p className="order-item-note">
+                  📝 {order.address.note}
+                </p>
+              )}
             </div>
 
             {/* Tổng tiền + ngày */}
@@ -222,6 +229,7 @@ const Orders = ({ url }) => {
 
             {/* Dropdown status */}
             <select onChange={(e) => statusHandler(e, order._id)} value={order.status}>
+              <option value="Pending">Pending</option>
               <option value="Food Processing">Food Processing</option>
               <option value="Out for delivery">Out for delivery</option>
               <option value="Delivered">Delivered</option>
@@ -233,14 +241,22 @@ const Orders = ({ url }) => {
                   Mark as Paid
                 </button>
               )}
-              <button className="btn-delete-order" onClick={() => deleteOrder(order._id)} title="Delete">
-                🗑
-              </button>
+              <button className="btn-delete-order" onClick={() => setConfirmModal({ open: true, orderId: order._id })} title="Delete">🗑</button>
             </div>
           </div>
         ))}
       </div>
+      <ConfirmDialog
+        open={confirmModal.open}
+        title="Delete Order"
+        description="Are you sure you want to delete this order? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmVariant="danger"
+        onConfirm={deleteOrder}
+        onClose={() => setConfirmModal({ open: false, orderId: null })}
+      />
     </div>
-  )
-}
+  );
+};
 export default Orders

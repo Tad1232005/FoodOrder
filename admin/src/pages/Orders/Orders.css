@@ -13,10 +13,14 @@
     background: #fff;
 }
 
-.order-item img { width: 40px; }
+.order-item img {
+    width: 40px;
+}
 
 .order-item-food,
-.order-item-name { font-weight: 600; }
+.order-item-name {
+    font-weight: 600;
+}
 
 .order-item-name {
     margin-top: 10px;
@@ -34,7 +38,10 @@
     gap: 4px;
 }
 
-.order-date { font-size: 11px; color: #aaa; }
+.order-date {
+    font-size: 11px;
+    color: #aaa;
+}
 
 /* Status dropdown */
 .order-item select {
@@ -66,10 +73,25 @@
     white-space: nowrap;
 }
 
-.badge-cod    { background: #fff3cd; color: #856404; }
-.badge-stripe { background: #cce5ff; color: #004085; }
-.badge-paid   { background: #d4edda; color: #155724; }
-.badge-unpaid { background: #f8d7da; color: #721c24; }
+.badge-cod {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-stripe {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.badge-paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-unpaid {
+    background: #f8d7da;
+    color: #721c24;
+}
 
 /* ── Action buttons ── */
 .order-actions {
@@ -90,7 +112,9 @@
     width: 100%;
 }
 
-.btn-mark-paid:hover { background: #218838; }
+.btn-mark-paid:hover {
+    background: #218838;
+}
 
 .btn-delete-order {
     background: #fff0f0;
@@ -104,7 +128,9 @@
     color: #e74c3c;
 }
 
-.btn-delete-order:hover { background: #ffe0e0; }
+.btn-delete-order:hover {
+    background: #ffe0e0;
+}
 
 .order-unpaid-stripe {
     border-left: 4px solid #f5c6cb;
@@ -150,7 +176,9 @@
     font-size: 13px;
 }
 
-.btn-reset-filter:hover { background: #e0e0e0; }
+.btn-reset-filter:hover {
+    background: #e0e0e0;
+}
 
 .order-count {
     margin-left: auto;
@@ -158,10 +186,21 @@
     color: #888;
 }
 
-.no-orders { text-align: center; color: #888; padding: 40px; }
+.no-orders {
+    text-align: center;
+    color: #888;
+    padding: 40px;
+}
+
+.order-item-note {
+    font-size: 14px;
+    color: #6b6a6a;
+    font-style: italic;
+    margin-top: 4px;
+}
 
 /* ════════════════════════════
-   DARK MODE — data-theme="dark"
+DARK MODE — data-theme="dark"
    ════════════════════════════ */
 [data-theme="dark"] .order-item {
     background: #1e1e1e;
@@ -169,8 +208,13 @@
     color: #ccc;
 }
 
-[data-theme="dark"] .order-item-address { color: #888; }
-[data-theme="dark"] .order-date { color: #666; }
+[data-theme="dark"] .order-item-address {
+    color: #888;
+}
+
+[data-theme="dark"] .order-date {
+    color: #666;
+}
 
 [data-theme="dark"] .order-item select {
     background-color: #2a1a1a;
@@ -193,8 +237,13 @@
     color: #eee;
 }
 
-[data-theme="dark"] .btn-reset-filter:hover { background: #333; }
-[data-theme="dark"] .order-count { color: #666; }
+[data-theme="dark"] .btn-reset-filter:hover {
+    background: #333;
+}
+
+[data-theme="dark"] .order-count {
+    color: #666;
+}
 
 /* Buttons dark */
 [data-theme="dark"] .btn-delete-order {
@@ -203,13 +252,30 @@
     color: #e74c3c;
 }
 
-[data-theme="dark"] .btn-delete-order:hover { background: #3a1a1a; }
+[data-theme="dark"] .btn-delete-order:hover {
+    background: #3a1a1a;
+}
 
 /* Badges dark — giữ màu gốc vẫn đọc được */
-[data-theme="dark"] .badge-cod    { background: #3d2e00; color: #ffc107; }
-[data-theme="dark"] .badge-stripe { background: #002a4a; color: #7ec8f7; }
-[data-theme="dark"] .badge-paid   { background: #0d2b14; color: #5cb85c; }
-[data-theme="dark"] .badge-unpaid { background: #2b0d0d; color: #e74c3c; }
+[data-theme="dark"] .badge-cod {
+    background: #3d2e00;
+    color: #ffc107;
+}
+
+[data-theme="dark"] .badge-stripe {
+    background: #002a4a;
+    color: #7ec8f7;
+}
+
+[data-theme="dark"] .badge-paid {
+    background: #0d2b14;
+    color: #5cb85c;
+}
+
+[data-theme="dark"] .badge-unpaid {
+    background: #2b0d0d;
+    color: #e74c3c;
+}
 
 /* ── Responsive ── */
 @media (max-width: 1100px) {

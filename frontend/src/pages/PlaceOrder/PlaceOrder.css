@@ -31,6 +31,14 @@
   gap: 10px;
 }
 
+.place-order-left textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  outline: none;
+  resize: vertical;
+}
+
 .place-order-right {
   width: 100%;
   max-width: max(40%, 500px);
@@ -138,24 +146,25 @@
   background-color: #fff4f4;
 }
 
+
 @media (max-width: 800px) {
   .place-order {
     flex-direction: column;
-    gap: 40px; 
-    margin-top: 50px; 
+    gap: 40px;
+    margin-top: 50px;
   }
 
   .place-order-left,
   .place-order-right {
-    max-width: 100%; 
+    max-width: 100%;
   }
 }
 
 @media (max-width: 500px) {
   .place-order-left .multi-fields {
-    flex-direction: column; 
+    flex-direction: column;
   }
-  
+
   .cart-promocode-input {
     flex-direction: column;
     gap: 10px;
@@ -166,6 +175,6 @@
   }
 
   .cart-promocode-input button {
-    width: 100%; 
+    width: 100%;
   }
 }

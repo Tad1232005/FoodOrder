@@ -2,14 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 import { Card, Col, Row, Statistic, Table, DatePicker, Progress, Empty, Tag, Select } from "antd";
-import { 
-  DollarOutlined, 
-  ShoppingCartOutlined, 
-  UserOutlined, 
-  AppstoreOutlined, 
-  CheckCircleOutlined, 
-  CloseCircleOutlined 
-} from "@ant-design/icons";
+import { DollarOutlined, ShoppingCartOutlined, UserOutlined, AppstoreOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import "./Dashboard.css";
 
@@ -113,8 +106,7 @@ const Dashboard = () => {
             value={filterType}
             onChange={setFilterType}
             className="filter-select"
-            dropdownClassName="dashboard-dropdown"
-          >
+            classNames={{ popup: { root: "dashboard-dropdown" } }}          >
             <Option value="day">Daily</Option>
             <Option value="month">Monthly</Option>
             <Option value="year">Yearly</Option>
@@ -249,7 +241,7 @@ const Dashboard = () => {
               columns={columns}
               dataSource={stats.recentOrders}
               pagination={false}
-              rowKey={(record) => record._id || record.id || Math.random()} 
+              rowKey={(record) => record._id || record.id || Math.random()}
             />
           </Card>
         </Col>

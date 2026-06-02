@@ -9,7 +9,7 @@ export default function FoodAdd() {
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
   const [category, setCategory] = useState('')
-  const [image, setImage] = useState(null)
+  const [images, setImages] = useState([])
   const [busy, setBusy] = useState(false)
 
   const canSubmit = useMemo(() => {
@@ -19,9 +19,9 @@ export default function FoodAdd() {
     if (!Number.isFinite(p) || p < 0) return false
     if (!category.trim()) return false
     if (!description.trim()) return false
-    if (!image) return false
+    if (images.length === 0) return false
     return true
-  }, [busy, name, price, category, description, image])
+  }, [busy, name, price, category, description, images])
 
   async function submit(e) {
     e?.preventDefault?.()
@@ -32,7 +32,7 @@ export default function FoodAdd() {
     fd.append('description', description.trim())
     fd.append('price', String(Number(price)))
     fd.append('category', category.trim())
-    fd.append('image', image)
+    images.forEach(img => fd.append('images', img))
 
     setBusy(true)
     const toastId = toast.loading('Adding…')
@@ -90,13 +90,19 @@ export default function FoodAdd() {
               <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0" />
             </label>
 
-            <label className="field">
-              <div className="field__label">Image</div>
+            <label className="field fieldFull">
+              <div className="field__label">Images (up to 10)</div>
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setImage(e.target.files?.[0] || null)}
+                multiple
+                onChange={(e) => setImages(Array.from(e.target.files || []))}
               />
+              {images.length > 0 && (
+                <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>
+                  {images.length} image(s) selected
+                </div>
+              )}
             </label>
 
             <div className="modal__actions modal__actions--sticky fieldFull">

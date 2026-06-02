@@ -1,0 +1,20 @@
+.star-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.star { line-height: 1; transition: transform 0.1s; }
+
+.star-filled { color: #f5a623; }
+.star-half   { color: #f5a623; }
+.star-empty  { color: #ddd; }
+
+.star-interactive {
+    cursor: pointer;
+}
+
+.star-interactive:hover {
+    transform: scale(1.2);
+    color: #f5a623;
+}

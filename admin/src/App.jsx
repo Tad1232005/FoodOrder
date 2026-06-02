@@ -12,6 +12,7 @@ import { useAdminSession } from './context/AdminSessionContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { url } from './config/config.js'
 import "antd/dist/reset.css";
+import Reviews from "./pages/Reviews/Reviews.jsx";
 
 function RequireNotStaff({ children }) {
   const { user } = useAdminSession()
@@ -36,6 +37,8 @@ const App = () => {
           <Route path="/foods" element={<FoodList />} />
           <Route path="/foods/new" element={<FoodAdd />} />
           <Route path="/orders" element={<Orders url={url} />} />
+          <Route path="/reviews" element={<Reviews url={url} />} />
+
           <Route
             path="/users"
             element={

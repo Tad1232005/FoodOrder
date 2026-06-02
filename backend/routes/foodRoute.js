@@ -1,6 +1,7 @@
 import express from "express";
-import { addFood, listFood, removeFood, updateFood } from "../controllers/foodController.js";
+import { addFood, listFood, removeFood, updateFood, getFoodById } from "../controllers/foodController.js";
 import multer from "multer";
+import adminAuth from "../middleware/adminAuth.js";
 
 const foodRouter = express.Router();
 
@@ -16,8 +17,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }); // Note: Khởi tạo middleware upload
 
 // Note: Tạo API phương thức POST. Khi gọi API này, nó sẽ chạy middleware upload ảnh trước, rồi mới chạy hàm addFood
-foodRouter.post("/add", upload.single("image"), addFood);
+foodRouter.post("/add", adminAuth, upload.array("images", 10), addFood); // Support up to 10 images
 foodRouter.get("/list", listFood);
-foodRouter.post("/remove", removeFood);
-foodRouter.post("/update", updateFood);
+foodRouter.post("/remove", adminAuth, removeFood);
+foodRouter.post("/update", adminAuth, upload.array("images", 10), updateFood); // Support up to 10 images
+foodRouter.get("/item/:id", getFoodById);
 export default foodRouter;

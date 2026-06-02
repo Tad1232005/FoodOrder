@@ -1,26 +1,28 @@
-import { useState, useEffect, useCallback } from 'react'; 
+import { useState, useEffect, useCallback } from 'react';
 import './Discounts.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import ConfirmDialog from "../../components/Modal/ConfirmDialog.jsx";
 
 const Discounts = ({ url }) => {
-    const backendUrl = url || "http://localhost:4000"; 
+    const backendUrl = url || "http://localhost:4000";
 
     const [discounts, setDiscounts] = useState([]);
-    
+
     // State cho form Thêm mã
     const [data, setData] = useState({
         code: "",
-        discountType: "percent", 
+        discountType: "percent",
         discountValue: "",
         expireDate: "",
-        minOrderAmount: "" 
+        minOrderAmount: ""
     });
 
     // --- STATE TÌM KIẾM & CHỈNH SỬA  ---
     const [searchTerm, setSearchTerm] = useState("");
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingDiscount, setEditingDiscount] = useState(null);
+    const [confirmModal, setConfirmModal] = useState({ open: false, discountId: null });
 
     const onChangeHandler = (event) => {
         const name = event.target.name;
@@ -31,8 +33,8 @@ const Discounts = ({ url }) => {
     // --- CÁC HÀM XỬ LÝ CHỈNH SỬA ---
     const openEditModal = (discount) => {
         // Format lại ngày tháng chuẩn YYYY-MM-DD để hiển thị đúng trong thẻ <input type="date">
-        const formattedDate = discount.expireDate 
-            ? new Date(discount.expireDate).toISOString().split('T')[0] 
+        const formattedDate = discount.expireDate
+            ? new Date(discount.expireDate).toISOString().split('T')[0]
             : "";
         setEditingDiscount({ ...discount, expireDate: formattedDate });
         setIsEditModalOpen(true);
@@ -49,7 +51,7 @@ const Discounts = ({ url }) => {
     const handleUpdateDiscount = async (e) => {
         e.preventDefault();
         const submitData = { ...editingDiscount };
-        
+
         if (submitData.discountType === 'freeship') {
             submitData.discountValue = 0;
         }
@@ -79,18 +81,18 @@ const Discounts = ({ url }) => {
                 toast.error("Failed to load discounts!");
             }
         } catch (error) {
-            console.error(error); 
+            console.error(error);
             toast.error("Server connection error!");
         }
     }, [backendUrl]);
 
     // API 2: Gửi form tạo mã mới
     const onSubmitHandler = async (event) => {
-        event.preventDefault(); 
-        
+        event.preventDefault();
+
         const submitData = { ...data };
         if (submitData.discountType === 'freeship') {
-            submitData.discountValue = 0; 
+            submitData.discountValue = 0;
         }
 
         try {
@@ -110,29 +112,29 @@ const Discounts = ({ url }) => {
 
     // API 3: Xóa mã
     const removeDiscount = async (discountId) => {
-        if (window.confirm("Are you sure you want to delete this discount?")) {
-            try {
-                const response = await axios.post(`${backendUrl}/api/discount/remove`, { id: discountId });
-                if (response.data.success) {
-                    fetchDiscounts();
-                    toast.success(response.data.message);
-                } else {
-                    toast.error("Error removing discount!");
-                }
-            } catch (error) {
-                console.error(error);
-                toast.error("Server connection error!");
+        try {
+            const response = await axios.post(`${backendUrl}/api/discount/remove`, { id: discountId });
+            if (response.data.success) {
+                fetchDiscounts();
+                toast.success(response.data.message);
+            } else {
+                toast.error("Error removing discount!");
             }
+        } catch (error) {
+            console.error(error);
+            toast.error("Server connection error!");
+        } finally {
+            setConfirmModal({ open: false, discountId: null });
         }
     }
 
     // Hàm kiểm tra trạng thái
     const checkStatus = (expireDate, isActive) => {
         if (isActive === false) return <span className="discount-badge status-disabled">Disabled</span>;
-        
+
         const currentDate = new Date();
         const expiryDate = new Date(expireDate);
-        
+
         if (currentDate > expiryDate) {
             return <span className="discount-badge status-expired">Expired</span>;
         }
@@ -150,7 +152,7 @@ const Discounts = ({ url }) => {
     useEffect(() => {
         const loadData = async () => {
             await fetchDiscounts();
-        };  
+        };
         loadData();
     }, [fetchDiscounts]);
 
@@ -158,14 +160,14 @@ const Discounts = ({ url }) => {
         <div className="discount-container">
             <h3>Manage Discounts</h3>
             <br />
-            
+
             {/* --- FORM THÊM MÃ GIẢM GIÁ --- */}
             <form className="discount-form" onSubmit={onSubmitHandler}>
                 <div className="form-group">
                     <p>Discount Code</p>
                     <input onChange={onChangeHandler} value={data.code} type="text" name="code" placeholder="Enter code..." required />
                 </div>
-                
+
                 <div className="form-group">
                     <p>Discount Type</p>
                     <select onChange={onChangeHandler} value={data.discountType} name="discountType">
@@ -177,12 +179,12 @@ const Discounts = ({ url }) => {
 
                 <div className="form-group">
                     <p>Discount Value</p>
-                    <input 
-                        onChange={onChangeHandler} 
-                        value={data.discountType === 'freeship' ? 0 : data.discountValue} 
-                        type="number" 
-                        name="discountValue" 
-                        placeholder="e.g., 10" 
+                    <input
+                        onChange={onChangeHandler}
+                        value={data.discountType === 'freeship' ? 0 : data.discountValue}
+                        type="number"
+                        name="discountValue"
+                        placeholder="e.g., 10"
                         required={data.discountType !== 'freeship'}
                         disabled={data.discountType === 'freeship'}
                         style={{
@@ -207,13 +209,13 @@ const Discounts = ({ url }) => {
 
             {/* --- BẢNG DANH SÁCH MÃ GIẢM GIÁ --- */}
             <div className="discount-list">
-                
+
                 {/* THANH TIÊU ĐỀ + TÌM KIẾM CÙNG 1 DÒNG */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <div style={{ overflowX: "auto", display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                     <h3 style={{ margin: 0 }}>All Discounts List</h3>
-                    <input 
-                        type="text" 
-                        placeholder="🔍 Search code or type..." 
+                    <input
+                        type="text"
+                        placeholder="🔍 Search code or type..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="search-discount-input"
@@ -230,30 +232,28 @@ const Discounts = ({ url }) => {
                         <b>Status</b>
                         <b>Action</b>
                     </div>
-                    
+
                     {/* SỬ DỤNG MẢNG ĐÃ LỌC: filteredDiscounts */}
                     {filteredDiscounts.map((item, index) => {
                         return (
                             <div key={index} className="discount-list-table-format">
-                                <p className="code-text">{item.code}</p>
-                                <p>{item.discountType === 'freeship' ? 'Free Shipping' : item.discountType}</p>
-                                
-                                <p>
-                                    {item.discountType === 'freeship' 
-                                        ? 'Free Ship' 
+                                <span className="code-text">{item.code}</span>
+                                <span>{item.discountType === 'freeship' ? 'Free Shipping' : item.discountType}</span>
+                                <span>
+                                    {item.discountType === 'freeship'
+                                        ? 'Free Ship'
                                         : `${item.discountValue}${item.discountType === 'percent' ? '%' : '$'}`
                                     }
-                                </p>
-                                
-                                <p className="min-order-text">${item.minOrderAmount || 0}</p>
-                                <p>{new Date(item.expireDate).toLocaleDateString('en-US')}</p>
+                                </span>
+                                <span className="min-order-text">${item.minOrderAmount || 0}</span>
+                                <span>{new Date(item.expireDate).toLocaleDateString('en-US')}</span>
                                 <div>{checkStatus(item.expireDate, item.isActive)}</div>
-                                
+
                                 {/* CỘT ACTION CHỨA CẢ 2 NÚT EDIT VÀ REMOVE */}
-<div style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
-    <p onClick={() => openEditModal(item)} className='cursor edit-icon'>Edit</p>
-    <p onClick={() => removeDiscount(item._id)} className='cursor remove-icon'>Remove</p>
-</div>
+                                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
+                                    <span onClick={() => openEditModal(item)} className="cursor edit-icon">Edit</span>
+                                    <span onClick={() => setConfirmModal({ open: true, discountId: item._id })} className="cursor remove-icon">Remove</span>
+                                </div>
                             </div>
                         )
                     })}
@@ -266,12 +266,12 @@ const Discounts = ({ url }) => {
                     <div className="discount-modal-content">
                         <h3>Edit Promo Code: <span style={{ color: '#fc4c24' }}>{editingDiscount.code}</span></h3>
                         <form onSubmit={handleUpdateDiscount}>
-                            
+
                             <div className="form-group-modal">
                                 <label>Discount Code</label>
                                 <input type="text" name="code" value={editingDiscount.code} onChange={handleEditInputChange} required />
                             </div>
-                            
+
                             <div className="form-group-modal">
                                 <label>Discount Type</label>
                                 <select name="discountType" value={editingDiscount.discountType} onChange={handleEditInputChange}>
@@ -283,12 +283,12 @@ const Discounts = ({ url }) => {
 
                             <div className="form-group-modal">
                                 <label>Discount Value</label>
-                                <input 
-                                    type="number" 
-                                    name="discountValue" 
-                                    value={editingDiscount.discountType === 'freeship' ? 0 : editingDiscount.discountValue} 
-                                    onChange={handleEditInputChange} 
-                                    required={editingDiscount.discountType !== "freeship"} 
+                                <input
+                                    type="number"
+                                    name="discountValue"
+                                    value={editingDiscount.discountType === 'freeship' ? 0 : editingDiscount.discountValue}
+                                    onChange={handleEditInputChange}
+                                    required={editingDiscount.discountType !== "freeship"}
                                     disabled={editingDiscount.discountType === "freeship"}
                                 />
                             </div>
@@ -300,22 +300,22 @@ const Discounts = ({ url }) => {
 
                             <div className="form-group-modal">
                                 <label>Expiration Date</label>
-                                <input 
-                                    type="date" 
-                                    name="expireDate" 
-                                    value={editingDiscount.expireDate} 
-                                    onChange={handleEditInputChange} 
-                                    required 
+                                <input
+                                    type="date"
+                                    name="expireDate"
+                                    value={editingDiscount.expireDate}
+                                    onChange={handleEditInputChange}
+                                    required
                                 />
                             </div>
 
                             <div className="form-group-modal" style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
-                                <input 
-                                    type="checkbox" 
-                                    name="isActive" 
-                                    checked={editingDiscount.isActive ?? true} 
-                                    onChange={handleEditInputChange} 
-                                    style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#fc4c24' }} 
+                                <input
+                                    type="checkbox"
+                                    name="isActive"
+                                    checked={editingDiscount.isActive ?? true}
+                                    onChange={handleEditInputChange}
+                                    style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#fc4c24' }}
                                 />
                                 <label style={{ margin: 0, cursor: 'pointer', color: '#fff' }}>Enable this code</label>
                             </div>
@@ -329,6 +329,16 @@ const Discounts = ({ url }) => {
                     </div>
                 </div>
             )}
+            <ConfirmDialog
+                open={confirmModal.open}
+                title="Delete Discount"
+                description="Are you sure you want to delete this discount code? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                confirmVariant="danger"
+                onConfirm={removeDiscount}
+                onClose={() => setConfirmModal({ open: false, discountId: null })}
+            />
         </div>
     );
 };
