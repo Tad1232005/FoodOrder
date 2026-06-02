@@ -1,26 +1,36 @@
-import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
-export const sendInviteEmail = async ({ to, name, role, link }) => {
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465, // Cổng bảo mật SMTP của Google
-        secure: true, // Bắt buộc là true khi dùng port 465
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM = process.env.RESEND_FROM || "onboarding@resend.dev";
+
+async function sendEmail({ to, subject, html }) {
+    if (!RESEND_API_KEY) {
+        throw new Error("Missing RESEND_API_KEY");
+    }
+
+    const resp = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
         },
-        tls: {
-            rejectUnauthorized: false,
-            minVersion: "TLSv1.2",
-        },
-        connectionTimeout: 10_000,
-        greetingTimeout: 10_000,
-        socketTimeout: 15_000,
-        family: 4,
+        body: JSON.stringify({
+            from: RESEND_FROM,
+            to: Array.isArray(to) ? to : [to],
+            subject,
+            html,
+        }),
     });
 
-    await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+    if (!resp.ok) {
+        const text = await resp.text().catch(() => "");
+        throw new Error(`Resend error ${resp.status}: ${text}`);
+    }
+}
+
+export const sendInviteEmail = async ({ to, name, role, link }) => {
+    await sendEmail({
         to,
         subject: "Invitation to join system",
         html: `

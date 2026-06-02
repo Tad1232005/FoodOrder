@@ -1,32 +1,37 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import nodemailer from "nodemailer";
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM = process.env.RESEND_FROM || "onboarding@resend.dev";
 
-// Tạo transporter dùng Gmail
-const transporter = nodemailer.createTransport({
-    // Dùng cấu hình SMTP chuẩn để tránh khác biệt giữa môi trường/local/Render.
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // bắt buộc true với port 465
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-    // Tránh request "treo" vô hạn khi SMTP chậm/bị chặn trên host
-    connectionTimeout: 10_000,
-    greetingTimeout: 10_000,
-    socketTimeout: 15_000,
-    tls: {
-        rejectUnauthorized: false,
-        minVersion: "TLSv1.2",
-    },
-});
+async function sendEmail({ to, subject, html }) {
+    if (!RESEND_API_KEY) {
+        throw new Error("Missing RESEND_API_KEY");
+    }
+
+    const resp = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            from: RESEND_FROM,
+            to: Array.isArray(to) ? to : [to],
+            subject,
+            html,
+        }),
+    });
+
+    if (!resp.ok) {
+        const text = await resp.text().catch(() => "");
+        throw new Error(`Resend error ${resp.status}: ${text}`);
+    }
+}
 
 // Gửi mã xác thực 6 số
 export const sendVerifyEmail = async (toEmail, code) => {
-    await transporter.sendMail({
-        from: `"FoodOrder" <${process.env.EMAIL_USER}>`,
+    await sendEmail({
         to: toEmail,
         subject: "Your verification code",
         html: `
