@@ -14,3 +14,10 @@ export const registerLimiter = rateLimit({
     max: 5,
     message: { success: false, message: "Too many registrations, try again later" }
 });
+
+// Resend OTP: tối đa 3 lần / 10 phút / 1 IP
+export const resendVerifyLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 3,
+    message: { success: false, message: "Too many resend attempts. Please try again later." }
+});

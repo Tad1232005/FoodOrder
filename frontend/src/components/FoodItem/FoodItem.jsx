@@ -12,8 +12,7 @@ const FoodItem = ({ id, name, price, description, images }) => {
 
     return (
         <div className="food-item">
-            <div className="food-item-img-container" onClick={() => navigate(`/food/${id}`)} style={{ cursor: "pointer" }}>
-
+            <div className="food-item-img-container">
                 <img className="food-item-image" src={url + "/images/" + (Array.isArray(images) ? images[0] : images)} alt="" />
                 {!cartItems[id]
                     ? <img className="add" onClick={() => addToCart(id)} src={assets.add_icon_white} alt="" />

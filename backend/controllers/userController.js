@@ -161,8 +161,8 @@ const resendVerifyCode = async (req, res) => {
 
         res.json({ success: true, message: "New code sent!" });
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error sending code" });
+        console.error("RESEND OTP ERROR:", error);
+        res.json({ success: false, message: "Could not send verification code. Please try again later." });
     }
 };
 

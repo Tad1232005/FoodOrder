@@ -17,7 +17,7 @@ const StarRating = ({ rating, maxStars = 5, size = 20, interactive = false, onCh
                         style={{ fontSize: size }}
                         onClick={() => interactive && onChange?.(star)}
                     >
-                        {filled ? "★" : half ? "⯨" : "☆"}
+                        {filled ? "★" : half ? "★" : "☆"}
                     </span>
                 );
             })}

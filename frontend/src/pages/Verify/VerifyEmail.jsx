@@ -11,11 +11,11 @@ export default function VerifyEmail() {
 
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const [loading, setLoading] = useState(false);
+    const [resending, setResending] = useState(false);
     const [count, setCount] = useState(60);
     const [success, setSuccess] = useState(false);
-    
-    // Thêm state để quản lý thông báo lỗi có CSS thay vì dùng alert
-    const [errorMsg, setErrorMsg] = useState(""); 
+    const [errorMsg, setErrorMsg] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
     
     const inputs = useRef([]);
 
@@ -29,7 +29,8 @@ export default function VerifyEmail() {
     // Xử lý khi người dùng dán (paste) mã code
     const handlePaste = (e) => {
         e.preventDefault();
-        setErrorMsg(""); // Xóa lỗi khi dán mã mới
+        setErrorMsg("");
+        setSuccessMsg("");
         const pasteData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
         if (!pasteData) return;
 
@@ -42,7 +43,8 @@ export default function VerifyEmail() {
     // Xử lý nhập từng số
     const handleChange = (value, index) => {
         if (!/^\d*$/.test(value)) return;
-        setErrorMsg(""); // Xóa lỗi khi người dùng gõ lại số
+        setErrorMsg("");
+        setSuccessMsg("");
 
         const newOtp = [...otp];
         newOtp[index] = value.slice(-1);
@@ -69,8 +71,9 @@ export default function VerifyEmail() {
         }
 
         setLoading(true);
-        setErrorMsg(""); // Reset trạng thái lỗi
-        
+        setErrorMsg("");
+        setSuccessMsg("");
+
         try {
             const res = await axios.post(`${url}/api/user/verify-email`, { email, code });
 
@@ -85,17 +88,55 @@ export default function VerifyEmail() {
                     localStorage.removeItem("verifyEmail");
                     navigate("/login");
                 }, 2000);
+            } else {
+                const backendMsg = res.data.message || "";
+                if (backendMsg.toLowerCase().includes("expire")) {
+                    setErrorMsg("Verification code has expired. Please request a new one.");
+                } else if (backendMsg.toLowerCase().includes("invalid")) {
+                    setErrorMsg("Incorrect verification code. Please try again.");
+                } else {
+                    setErrorMsg(backendMsg || "Verification failed. Please try again.");
+                }
             }
         } catch (err) {
-            // Xử lý Task 2: Phân biệt thông báo code hết hạn hoặc code sai
             const backendMsg = err.response?.data?.message || "";
             if (backendMsg.toLowerCase().includes("expire")) {
                 setErrorMsg("Verification code has expired. Please request a new one.");
             } else {
-                setErrorMsg("Incorrect verification code. Please try again.");
+                setErrorMsg(backendMsg || "Incorrect verification code. Please try again.");
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const onResendHandler = async () => {
+        if (count > 0 || resending || success) return;
+
+        if (!email) {
+            setErrorMsg("Session expired. Please register again.");
+            return;
+        }
+
+        setResending(true);
+        setErrorMsg("");
+        setSuccessMsg("");
+
+        try {
+            const res = await axios.post(`${url}/api/user/resend-verify`, { email });
+
+            if (res.data.success) {
+                setSuccessMsg("A new verification code has been sent to your email.");
+                setOtp(new Array(6).fill(""));
+                setCount(60);
+                inputs.current[0]?.focus();
+            } else {
+                setErrorMsg(res.data.message || "Could not resend code. Please try again.");
+            }
+        } catch (err) {
+            setErrorMsg(err.response?.data?.message || "Could not resend code. Please try again.");
+        } finally {
+            setResending(false);
         }
     };
 
@@ -105,7 +146,12 @@ export default function VerifyEmail() {
                 <h2>Verify Email</h2>
                 <p>Enter 6-digit code sent to <strong>{email}</strong></p>
 
-                {/* UI Thông báo lỗi được gọi bằng class CSS */}
+                {successMsg && (
+                    <div className="success-msg-box">
+                        {successMsg}
+                    </div>
+                )}
+
                 {errorMsg && (
                     <div className="error-msg-box">
                         {errorMsg}
@@ -132,8 +178,11 @@ export default function VerifyEmail() {
 
                 <div className="resend">
                     Didn't get code?{" "}
-                    <span className={count > 0 ? "disabled" : "link"} onClick={() => count === 0 && setCount(60)}>
-                        Resend {count > 0 && `(${count}s)`}
+                    <span
+                        className={count > 0 || resending ? "disabled" : "link"}
+                        onClick={onResendHandler}
+                    >
+                        {resending ? "Sending..." : `Resend${count > 0 ? ` (${count}s)` : ""}`}
                     </span>
                 </div>
             </div>
