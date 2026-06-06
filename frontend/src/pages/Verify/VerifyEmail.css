@@ -33,6 +33,31 @@
     margin-bottom: 20px;
 }
 
+.error-msg-box,
+.success-msg-box {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+.error-msg-box {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+
+.success-msg-box {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: #86efac;
+}
+
+.otp-container input.input-error {
+    border-color: rgba(239, 68, 68, 0.6);
+}
+
 /* OTP INPUT giống login vibe */
 .otp-container {
     display: flex;
@@ -90,9 +115,14 @@
     color: #aaa;
 }
 
-.resend span {
+.resend span.link {
     color: #5b9bd5;
     cursor: pointer;
+}
+
+.resend span.disabled {
+    color: #666;
+    cursor: not-allowed;
 }
 
 /* success overlay */

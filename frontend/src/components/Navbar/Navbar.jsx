@@ -76,7 +76,6 @@ const Navbar = () => {
             <ul className="navbar-menu">
                 <Link to="/" className={isActive("/")}>Home</Link>
                 <Link to="/shop" className={isActive("/shop")}>Shop</Link>
-                <a href="#" className={isActive("/mobile-app")}>Mobile-app</a>
                 <a href="#footer">Contact us</a>
             </ul>
             {/* phần còn lại giữ nguyên */}

@@ -28,7 +28,8 @@ export const setPassword = async (req, res) => {
 
         return res.json({
             success: true,
-            message: "Password set successfully"
+            message: "Password set successfully",
+            role: user.role,
         });
 
     } catch (err) {
