@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { url } from '../config/config.js'
 
 const client = axios.create({
-  baseURL: 'http://localhost:4000',
+  baseURL: url,
 })
 
 client.interceptors.request.use((config) => {
@@ -76,7 +77,7 @@ export async function deleteUser(payload) {
 
 export function imageUrl(imageFilename) {
   if (!imageFilename) return ''
-  return `http://localhost:4000/images/${imageFilename}`
+  return `${url}/images/${imageFilename}`
 }
 
 export default client

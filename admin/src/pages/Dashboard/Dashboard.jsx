@@ -5,6 +5,7 @@ import { Card, Col, Row, Statistic, Table, DatePicker, Progress, Empty, Tag, Sel
 import { DollarOutlined, ShoppingCartOutlined, UserOutlined, AppstoreOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import "./Dashboard.css";
+import { url } from '../../config/config.js'
 
 const { Option } = Select;
 
@@ -33,7 +34,7 @@ const Dashboard = () => {
   // TẢI DỮ LIỆU DASHBOARD
   const fetchDashboard = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/admin/dashboard", {
+      const res = await axios.get(`${url}/api/admin/dashboard`, {
         params: {
           filterType,
           date: selectedDate.format("YYYY-MM-DD"),

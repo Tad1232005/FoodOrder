@@ -10,16 +10,17 @@ export default function SetPassword() {
 
     const token = searchParams.get("token");
 
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
     const handleSubmit = async () => {
         try {
-            const res = await axios.post("http://localhost:4000/api/auth/set-password", {
+            const res = await axios.post(`${backendUrl}/api/auth/set-password`, {
                 token,
                 password
             });
 
             if (res.data.success) {
                 alert("Password set success!");
-                window.location.href = "http://localhost:5174/login";
+                navigate("/login", { replace: true });
             }
         } catch (err) {
             alert("Error");

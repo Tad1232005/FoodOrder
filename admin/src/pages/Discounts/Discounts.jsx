@@ -3,8 +3,9 @@ import './Discounts.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import ConfirmDialog from "../../components/Modal/ConfirmDialog.jsx";
+import { url } from '../../config/config.js'
 
-const Discounts = ({ url }) => {
+const Discounts = () => {
     const backendUrl = url || "http://localhost:4000";
 
     const [discounts, setDiscounts] = useState([]);
