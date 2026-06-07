@@ -81,7 +81,7 @@ export default function AdminLayout() {
             T
           </div>
           <div className="adminBrand__text">
-            <div className="adminBrand__title">Tomato</div>
+            <div className="adminBrand__title">FoodOrder</div>
             <div className="adminBrand__subtitle">Admin</div>
           </div>
         </div>
