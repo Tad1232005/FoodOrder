@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 const SEO = ({ title, description, image, url }) => {
     const siteName = "FoodOrder";
     const defaultDesc = "Order delicious food online - fast delivery to your door";
-    const defaultImg = "/logo.png";
+    const defaultImg = "/logo-512.jpg";
 
     return (
         <Helmet>

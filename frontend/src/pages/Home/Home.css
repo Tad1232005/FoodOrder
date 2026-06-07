@@ -1,0 +1,210 @@
+/* ── Video section ── */
+.home-video-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    padding: 60px 5%;
+    background: #fff8f5;
+}
+
+.home-video-text h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #262626;
+    margin-bottom: 12px;
+}
+
+.home-video-text p {
+    color: #888;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.home-video-wrap {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.home-video {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    display: block;
+}
+
+/* ── Top rated ── */
+.home-top-rated {
+    padding: 60px 5%;
+}
+
+.home-top-rated h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #262626;
+    margin-bottom: 6px;
+}
+
+.home-top-rated > p {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.home-top-rated-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* ── Banner carousel ── */
+.home-banner {
+    position: relative;
+    overflow: hidden;
+    margin: 40px 5%;
+    border-radius: 16px;
+    height: 500px;
+}
+
+.home-banner-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.home-banner-img {
+    min-width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* ← THAY 3 ẢNH trong bannerImages[] bằng ảnh thật */
+}
+
+.home-banner-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+}
+
+.home-banner-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.home-banner-dot.active {
+    background: white;
+    width: 20px;
+    border-radius: 4px;
+}
+
+.home-banner-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.8);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.2s;
+}
+
+.home-banner-arrow:hover { background: white; }
+.home-banner-arrow.left  { left: 12px; }
+.home-banner-arrow.right { right: 12px; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .home-video-section {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 40px 5%;
+    }
+
+    .home-banner { height: 220px; }
+    .home-video  { height: 200px; }
+}
+
+.home-banner-slide {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.home-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to right,
+        rgba(0,0,0,0.55) 0%,
+        rgba(0,0,0,0.2) 60%,
+        rgba(0,0,0,0) 100%
+    );
+}
+
+.home-banner-text {
+    position: absolute;
+    left: 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    z-index: 2;
+    max-width: 45%;
+}
+
+.home-banner-tag {
+    display: inline-block;
+    background: tomato;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.home-banner-text h3 {
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 800;
+    margin: 0 0 10px;
+    line-height: 1.2;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.home-banner-text p {
+    font-size: clamp(12px, 1.5vw, 15px);
+    color: rgba(255,255,255,0.9);
+    line-height: 1.5;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Sửa lại track để dùng slide */
+.home-banner-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.home-banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .home-banner-text { max-width: 70%; }
+    .home-banner-text h3 { font-size: 1.2rem; }
+}
